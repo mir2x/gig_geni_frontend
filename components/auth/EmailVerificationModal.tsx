@@ -183,7 +183,7 @@ export function EmailVerificationModal({ isOpen, onClose, email, onBackToAuth }:
                                     Your email has been successfully verified. Redirecting you to your dashboard...
                                 </p>
 
-                                <Badge className="bg-green-100 text-green-800 border-green-200">
+                                <Badge variant="outline" className="bg-green-100 text-green-800 border-green-200">
                                     <CheckCircle className="h-3 w-3 mr-1" />
                                     Verification Complete
                                 </Badge>

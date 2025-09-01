@@ -154,9 +154,9 @@ export function AuthModal({ isOpen, onClose, defaultMode = 'login', onVerificati
 
   const quickLogin = async (userType: 'admin' | 'employer' | 'employee') => {
     const credentials = {
-      admin: { email: 'admin@gigGeni.com', password: 'password123' },
-      employer: { email: 'employer@gigGeni.com', password: 'password123' },
-      employee: { email: 'employee@gigGeni.com', password: 'password123' }
+      admin: { email: 'admin@giggeni.com', password: 'password123' },
+      employer: { email: 'employer@giggeni.com', password: 'password123' },
+      employee: { email: 'employee@giggeni.com', password: 'password123' }
     };
     
     // Auto-fill the form with dummy credentials
@@ -171,9 +171,9 @@ export function AuthModal({ isOpen, onClose, defaultMode = 'login', onVerificati
 
   const handleDummyLogin = async (userType: 'admin' | 'employer' | 'employee') => {
     const credentials = {
-      admin: { email: 'admin@gigGeni.com', password: 'password123' },
-      employer: { email: 'employer@gigGeni.com', password: 'password123' },
-      employee: { email: 'employee@gigGeni.com', password: 'password123' }
+      admin: { email: 'admin@giggeni.com', password: 'password123' },
+      employer: { email: 'employer@giggeni.com', password: 'password123' },
+      employee: { email: 'employee@giggeni.com', password: 'password123' }
     };
     
     setError('');

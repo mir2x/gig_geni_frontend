@@ -35,25 +35,25 @@ interface AuthState {
 
 // Dummy user credentials for testing
 const DUMMY_USERS: Record<string, User> = {
-  'admin@gigGeni.com': {
+  'admin@giggeni.com': {
     id: '1',
     name: 'Admin User',
-    email: 'admin@gigGeni.com',
+    email: 'admin@giggeni.com',
     role: 'admin',
     title: 'System Administrator'
   },
-  'employer@gigGeni.com': {
+  'employer@giggeni.com': {
     id: '2',
     name: 'John Smith',
-    email: 'employer@gigGeni.com',
+    email: 'employer@giggeni.com',
     role: 'employer',
     company: 'TechCorp Solutions',
     title: 'HR Manager'
   },
-  'employee@gigGeni.com': {
+  'employee@giggeni.com': {
     id: '3',
     name: 'Sarah Johnson',
-    email: 'employee@gigGeni.com',
+    email: 'employee@giggeni.com',
     role: 'employee',
     title: 'Frontend Developer'
   },

@@ -577,3 +577,24 @@ export const waitlistBenefits = [
   'Special launch promotions',
   'Direct feedback channel to our team',
 ];
+
+
+export const categories = [
+  'IT & Technology',
+  'Design & Creative',
+  'Marketing & Sales',
+  'Business & Strategy',
+  'Finance & Accounting',
+  'Engineering',
+  'Healthcare',
+  'Education',
+  'Other'
+];
+
+export const skillSuggestions = {
+  'IT & Technology': ['JavaScript', 'React', 'Node.js', 'Python', 'Java', 'AWS', 'Docker', 'MongoDB'],
+  'Design & Creative': ['Figma', 'Adobe Creative Suite', 'UI/UX Design', 'Prototyping', 'User Research'],
+  'Marketing & Sales': ['Digital Marketing', 'SEO', 'Social Media', 'Content Marketing', 'Sales Strategy'],
+  'Business & Strategy': ['Business Analysis', 'Project Management', 'Strategic Planning', 'Leadership'],
+  'Finance & Accounting': ['Financial Analysis', 'Accounting', 'Excel', 'Financial Modeling', 'Budgeting']
+};
