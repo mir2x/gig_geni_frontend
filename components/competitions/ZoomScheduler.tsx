@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -142,75 +142,66 @@ export default function ZoomScheduler({
   onScheduleUpdate 
 }: ZoomSchedulerProps) {
   const [meetings, setMeetings] = useState<ZoomMeeting[]>(mockMeetings);
-  const [selectedParticipant, setSelectedParticipant] = useState<Participant | null>(null);
-  const [schedulingData, setSchedulingData] = useState({
-    date: '',
-    time: '',
+  const [meeting, setMeeting] = useState({
+    id: '',
+    title: 'Competition Interview - Round 3',
+    scheduledTime: '',
     duration: 60,
-    timezone: 'America/New_York',
-    title: '',
-    agenda: '',
-    sendReminder: true,
-    recordMeeting: true
+    zoomLink: '',
+    meetingId: '',
+    passcode: '',
+    status: 'not_created',
+    participantCount: 0
   });
-  const [activeTab, setActiveTab] = useState('schedule');
-  const [zoomSettings, setZoomSettings] = useState({
-    apiKey: '',
-    apiSecret: '',
-    defaultDuration: 60,
-    autoRecord: true,
-    waitingRoom: true,
-    muteOnEntry: true
-  });
-  const [bulkScheduling, setBulkScheduling] = useState({
-    startDate: '',
-    endDate: '',
-    timeSlots: [] as string[],
+  const [meetingForm, setMeetingForm] = useState({
+    title: 'Competition Interview - Round 3',
+    scheduledTime: '',
     duration: 60,
-    breakBetween: 15
+    description: 'Live interview session for competition participants'
   });
+  const [activeTab, setActiveTab] = useState('create');
+  const [notifications, setNotifications] = useState({
+    emailSent: false,
+    notificationSent: false,
+    reminderScheduled: false
+  });
+  const [participantsData] = useState([
+    { id: 'p1', name: 'John Doe', email: 'john@example.com', status: 'qualified' },
+    { id: 'p2', name: 'Jane Smith', email: 'jane@example.com', status: 'qualified' },
+    { id: 'p3', name: 'Mike Johnson', email: 'mike@example.com', status: 'qualified' },
+    { id: 'p4', name: 'Sarah Wilson', email: 'sarah@example.com', status: 'qualified' }
+  ]);
 
-  const handleScheduleInterview = () => {
-    if (!selectedParticipant || !schedulingData.date || !schedulingData.time) return;
+  const createMeeting = () => {
+    if (!meetingForm.scheduledTime) {
+      alert('Please select a meeting time');
+      return;
+    }
 
-    const meetingDateTime = new Date(`${schedulingData.date}T${schedulingData.time}:00`);
-    const newMeeting: ZoomMeeting = {
+    const newMeeting = {
       id: Date.now().toString(),
-      title: schedulingData.title || `Interview - ${selectedParticipant.name}`,
-      meetingId: Math.random().toString().substr(2, 11),
-      passcode: Math.random().toString(36).substr(2, 6),
-      joinUrl: `https://zoom.us/j/${Math.random().toString().substr(2, 11)}`,
-      startUrl: `https://zoom.us/s/${Math.random().toString().substr(2, 11)}`,
-      scheduledTime: meetingDateTime.toISOString(),
-      duration: schedulingData.duration,
-      participantIds: [selectedParticipant.id],
-      status: 'scheduled'
+      title: meetingForm.title,
+      scheduledTime: meetingForm.scheduledTime,
+      duration: meetingForm.duration,
+      zoomLink: `https://zoom.us/j/${Math.floor(Math.random() * 1000000000)}`,
+      meetingId: Math.floor(Math.random() * 1000000000).toString().replace(/(\d{3})(\d{3})(\d{3})/, '$1 $2 $3'),
+      passcode: Math.random().toString(36).substring(2, 8).toUpperCase(),
+      status: 'created' as const,
+      participantCount: participantsData.length
     };
 
-    setMeetings(prev => [...prev, newMeeting]);
-    onScheduleUpdate?.(selectedParticipant.id, {
-      interviewStatus: 'scheduled',
-      scheduledTime: meetingDateTime.toISOString(),
-      zoomLink: newMeeting.joinUrl
-    });
-
-    // Reset form
-    setSelectedParticipant(null);
-    setSchedulingData({
-      date: '',
-      time: '',
-      duration: 60,
-      timezone: 'America/New_York',
-      title: '',
-      agenda: '',
-      sendReminder: true,
-      recordMeeting: true
-    });
+    setMeeting(newMeeting);
   };
 
-  const handleSendNotification = (participant: Participant, meeting: ZoomMeeting) => {
-    // Simulate sending notification
-    console.log('Sending notification to:', participant.email);
+  const sendNotifications = () => {
+    // Simulate sending notifications
+    setNotifications({
+      emailSent: true,
+      notificationSent: true,
+      reminderScheduled: true
+    });
+    
+    alert(`Meeting details sent to ${participantsData.length} participants via email and in-app notifications!`);
   };
 
   const handleReschedule = (meetingId: string) => {
@@ -293,452 +284,242 @@ export default function ZoomScheduler({
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="grid w-full grid-cols-4">
-          <TabsTrigger value="schedule">Schedule Interviews</TabsTrigger>
-          <TabsTrigger value="meetings">Manage Meetings</TabsTrigger>
-          <TabsTrigger value="bulk">Bulk Scheduling</TabsTrigger>
-          <TabsTrigger value="settings">Zoom Settings</TabsTrigger>
+        <TabsList className="grid w-full grid-cols-3">
+          <TabsTrigger value="create">Create Meeting</TabsTrigger>
+          <TabsTrigger value="details">Meeting Details</TabsTrigger>
+          <TabsTrigger value="participants">Participants</TabsTrigger>
         </TabsList>
 
-        {/* Schedule Interviews */}
-        <TabsContent value="schedule" className="space-y-6">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {/* Participant Selection */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Select Participant</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                {eligibleParticipants.filter(p => p.interviewStatus === 'not_scheduled').map((participant) => (
-                  <div 
-                    key={participant.id}
-                    className={`p-4 border rounded-lg cursor-pointer transition-colors ${
-                      selectedParticipant?.id === participant.id ? 'border-orange-500 bg-orange-50' : 'hover:bg-gray-50'
-                    }`}
-                    onClick={() => setSelectedParticipant(participant)}
-                  >
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center space-x-3">
-                        <div className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center">
-                          <User className="h-5 w-5 text-gray-600" />
-                        </div>
-                        <div>
-                          <p className="font-medium">{participant.name}</p>
-                          <p className="text-sm text-gray-600">{participant.email}</p>
-                          <p className="text-xs text-gray-500">{participant.timezone}</p>
-                        </div>
-                      </div>
-                      <Badge className={getStatusColor(participant.interviewStatus)}>
-                        {participant.interviewStatus.replace('_', ' ')}
-                      </Badge>
-                    </div>
-                  </div>
-                ))}
-              </CardContent>
-            </Card>
-
-            {/* Scheduling Form */}
-            <Card>
-              <CardHeader>
-                <CardTitle>
-                  {selectedParticipant ? `Schedule Interview: ${selectedParticipant.name}` : 'Select a Participant'}
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                {selectedParticipant ? (
-                  <div className="space-y-4">
-                    <div className="grid grid-cols-2 gap-4">
-                      <div>
-                        <label className="block text-sm font-medium mb-2">Date</label>
-                        <Input
-                          type="date"
-                          value={schedulingData.date}
-                          onChange={(e) => setSchedulingData(prev => ({ ...prev, date: e.target.value }))}
-                          min={new Date().toISOString().split('T')[0]}
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium mb-2">Time</label>
-                        <Select value={schedulingData.time} onValueChange={(value) => setSchedulingData(prev => ({ ...prev, time: value }))}>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select time" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {timeSlots.map(time => (
-                              <SelectItem key={time} value={time}>{time}</SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </div>
-                    </div>
-                    
-                    <div className="grid grid-cols-2 gap-4">
-                      <div>
-                        <label className="block text-sm font-medium mb-2">Duration (minutes)</label>
-                        <Select value={schedulingData.duration.toString()} onValueChange={(value) => setSchedulingData(prev => ({ ...prev, duration: parseInt(value) }))}>
-                          <SelectTrigger>
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="30">30 minutes</SelectItem>
-                            <SelectItem value="45">45 minutes</SelectItem>
-                            <SelectItem value="60">60 minutes</SelectItem>
-                            <SelectItem value="90">90 minutes</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium mb-2">Timezone</label>
-                        <Select value={schedulingData.timezone} onValueChange={(value) => setSchedulingData(prev => ({ ...prev, timezone: value }))}>
-                          <SelectTrigger>
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {timezones.map(tz => (
-                              <SelectItem key={tz} value={tz}>{tz}</SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </div>
-                    </div>
-                    
-                    <div>
-                      <label className="block text-sm font-medium mb-2">Meeting Title</label>
-                      <Input
-                        value={schedulingData.title}
-                        onChange={(e) => setSchedulingData(prev => ({ ...prev, title: e.target.value }))}
-                        placeholder={`Interview - ${selectedParticipant.name}`}
-                      />
-                    </div>
-                    
-                    <div>
-                      <label className="block text-sm font-medium mb-2">Agenda</label>
-                      <Textarea
-                        value={schedulingData.agenda}
-                        onChange={(e) => setSchedulingData(prev => ({ ...prev, agenda: e.target.value }))}
-                        placeholder="Interview agenda and topics to cover..."
-                        rows={3}
-                      />
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm font-medium">Send Email Reminder</span>
-                        <input
-                          type="checkbox"
-                          checked={schedulingData.sendReminder}
-                          onChange={(e) => setSchedulingData(prev => ({ ...prev, sendReminder: e.target.checked }))}
-                          className="h-4 w-4 text-orange-500"
-                        />
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm font-medium">Record Meeting</span>
-                        <input
-                          type="checkbox"
-                          checked={schedulingData.recordMeeting}
-                          onChange={(e) => setSchedulingData(prev => ({ ...prev, recordMeeting: e.target.checked }))}
-                          className="h-4 w-4 text-orange-500"
-                        />
-                      </div>
-                    </div>
-                    
-                    <Button 
-                      onClick={handleScheduleInterview}
-                      className="w-full bg-orange-500 hover:bg-orange-600"
-                      disabled={!schedulingData.date || !schedulingData.time}
-                    >
-                      <Calendar className="h-4 w-4 mr-2" />
-                      Schedule Interview
-                    </Button>
-                  </div>
-                ) : (
-                  <div className="text-center py-12">
-                    <Calendar className="h-16 w-16 text-gray-300 mx-auto mb-4" />
-                    <p className="text-gray-600">Select a participant to schedule their interview</p>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          </div>
-        </TabsContent>
-
-        {/* Manage Meetings */}
-        <TabsContent value="meetings" className="space-y-6">
+        <TabsContent value="create" className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle>Scheduled Meetings</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {meetings.map((meeting) => {
-                  const participant = participants.find(p => p.id === meeting.participantIds[0]);
-                  return (
-                    <div key={meeting.id} className="p-4 border rounded-lg">
-                      <div className="flex items-start justify-between mb-3">
-                        <div>
-                          <h3 className="font-medium">{meeting.title}</h3>
-                          <p className="text-sm text-gray-600">{participant?.name} ({participant?.email})</p>
-                          <p className="text-xs text-gray-500">
-                            {new Date(meeting.scheduledTime).toLocaleString()} • {meeting.duration} minutes
-                          </p>
-                        </div>
-                        <Badge className={getStatusColor(meeting.status)}>
-                          {meeting.status}
-                        </Badge>
-                      </div>
-                      
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                        <div className="p-3 bg-gray-50 rounded-lg">
-                          <p className="text-xs font-medium text-gray-600 mb-1">Meeting ID</p>
-                          <div className="flex items-center space-x-2">
-                            <span className="text-sm font-mono">{meeting.meetingId}</span>
-                            <Button
-                              size="sm"
-                              variant="ghost"
-                              onClick={() => navigator.clipboard.writeText(meeting.meetingId)}
-                            >
-                              <Copy className="h-3 w-3" />
-                            </Button>
-                          </div>
-                        </div>
-                        <div className="p-3 bg-gray-50 rounded-lg">
-                          <p className="text-xs font-medium text-gray-600 mb-1">Passcode</p>
-                          <div className="flex items-center space-x-2">
-                            <span className="text-sm font-mono">{meeting.passcode}</span>
-                            <Button
-                              size="sm"
-                              variant="ghost"
-                              onClick={() => navigator.clipboard.writeText(meeting.passcode)}
-                            >
-                              <Copy className="h-3 w-3" />
-                            </Button>
-                          </div>
-                        </div>
-                      </div>
-                      
-                      <div className="flex flex-wrap gap-2">
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => window.open(meeting.joinUrl, '_blank')}
-                        >
-                          <Video className="h-4 w-4 mr-2" />
-                          Join Meeting
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => navigator.clipboard.writeText(meeting.joinUrl)}
-                        >
-                          <Copy className="h-4 w-4 mr-2" />
-                          Copy Link
-                        </Button>
-                        {participant && (
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() => handleSendNotification(participant, meeting)}
-                          >
-                            <Send className="h-4 w-4 mr-2" />
-                            Send Reminder
-                          </Button>
-                        )}
-                        {meeting.status === 'scheduled' && (
-                          <>
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              onClick={() => handleReschedule(meeting.id)}
-                            >
-                              <Edit className="h-4 w-4 mr-2" />
-                              Reschedule
-                            </Button>
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              onClick={() => handleCancelMeeting(meeting.id)}
-                              className="text-red-600 hover:text-red-700"
-                            >
-                              <XCircle className="h-4 w-4 mr-2" />
-                              Cancel
-                            </Button>
-                          </>
-                        )}
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        {/* Bulk Scheduling */}
-        <TabsContent value="bulk" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Bulk Interview Scheduling</CardTitle>
+              <CardTitle>Create Interview Meeting</CardTitle>
+              <CardDescription>
+                Create a single Zoom meeting for all qualified participants
+              </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium mb-2">Start Date</label>
-                  <Input
-                    type="date"
-                    value={bulkScheduling.startDate}
-                    onChange={(e) => setBulkScheduling(prev => ({ ...prev, startDate: e.target.value }))}
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium mb-2">End Date</label>
-                  <Input
-                    type="date"
-                    value={bulkScheduling.endDate}
-                    onChange={(e) => setBulkScheduling(prev => ({ ...prev, endDate: e.target.value }))}
-                  />
-                </div>
-              </div>
-              
               <div>
-                <label className="block text-sm font-medium mb-2">Available Time Slots</label>
-                <div className="grid grid-cols-4 gap-2">
-                  {timeSlots.map(time => (
-                    <label key={time} className="flex items-center space-x-2">
-                      <input
-                        type="checkbox"
-                        checked={bulkScheduling.timeSlots.includes(time)}
-                        onChange={(e) => {
-                          if (e.target.checked) {
-                            setBulkScheduling(prev => ({ ...prev, timeSlots: [...prev.timeSlots, time] }));
-                          } else {
-                            setBulkScheduling(prev => ({ ...prev, timeSlots: prev.timeSlots.filter(t => t !== time) }));
-                          }
-                        }}
-                        className="h-4 w-4 text-orange-500"
-                      />
-                      <span className="text-sm">{time}</span>
-                    </label>
-                  ))}
-                </div>
+                <label className="block text-sm font-medium mb-2">Meeting Title</label>
+                <Input
+                  value={meetingForm.title}
+                  onChange={(e) => setMeetingForm({...meetingForm, title: e.target.value})}
+                  placeholder="Enter meeting title"
+                />
               </div>
-              
+
+              <div>
+                <label className="block text-sm font-medium mb-2">Description</label>
+                <Textarea
+                  value={meetingForm.description}
+                  onChange={(e) => setMeetingForm({...meetingForm, description: e.target.value})}
+                  placeholder="Meeting description"
+                  rows={3}
+                />
+              </div>
+
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium mb-2">Interview Duration (minutes)</label>
+                  <label className="block text-sm font-medium mb-2">Interview Date & Time</label>
                   <Input
-                    type="number"
-                    value={bulkScheduling.duration}
-                    onChange={(e) => setBulkScheduling(prev => ({ ...prev, duration: parseInt(e.target.value) || 60 }))}
-                    min="15"
-                    max="180"
+                    type="datetime-local"
+                    value={meetingForm.scheduledTime}
+                    onChange={(e) => setMeetingForm({...meetingForm, scheduledTime: e.target.value})}
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-2">Break Between Interviews (minutes)</label>
+                  <label className="block text-sm font-medium mb-2">Duration (minutes)</label>
                   <Input
                     type="number"
-                    value={bulkScheduling.breakBetween}
-                    onChange={(e) => setBulkScheduling(prev => ({ ...prev, breakBetween: parseInt(e.target.value) || 15 }))}
-                    min="5"
-                    max="60"
+                    value={meetingForm.duration}
+                    onChange={(e) => setMeetingForm({...meetingForm, duration: parseInt(e.target.value)})}
+                    min="30"
+                    max="180"
                   />
                 </div>
               </div>
-              
-              <Button className="w-full bg-purple-500 hover:bg-purple-600">
-                <Zap className="h-4 w-4 mr-2" />
-                Generate Bulk Schedule
+
+              <div className="bg-blue-50 p-4 rounded-lg">
+                <div className="flex items-center space-x-2 mb-2">
+                  <Users className="h-4 w-4 text-blue-600" />
+                  <span className="text-sm font-medium text-blue-800">Participants</span>
+                </div>
+                <p className="text-sm text-blue-700">
+                  {participantsData.length} qualified participants will receive the meeting link
+                </p>
+              </div>
+
+              <Button 
+                onClick={createMeeting} 
+                className="w-full"
+                disabled={meeting.status === 'created'}
+              >
+                <Video className="h-4 w-4 mr-2" />
+                {meeting.status === 'created' ? 'Meeting Created' : 'Create Zoom Meeting'}
               </Button>
             </CardContent>
           </Card>
         </TabsContent>
 
-        {/* Zoom Settings */}
-        <TabsContent value="settings" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Zoom Integration Settings</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
-                <h3 className="font-medium text-blue-900 mb-2">API Configuration</h3>
-                <p className="text-sm text-blue-700 mb-4">
-                  Configure your Zoom API credentials to enable automatic meeting creation.
-                </p>
-                <div className="space-y-3">
+        <TabsContent value="details" className="space-y-6">
+          {meeting.status === 'created' ? (
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center space-x-2">
+                  <CheckCircle className="h-5 w-5 text-green-600" />
+                  <span>Meeting Created Successfully</span>
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium mb-1">API Key</label>
-                    <Input
-                      type="password"
-                      value={zoomSettings.apiKey}
-                      onChange={(e) => setZoomSettings(prev => ({ ...prev, apiKey: e.target.value }))}
-                      placeholder="Your Zoom API Key"
-                    />
+                    <label className="block text-sm font-medium mb-1">Meeting Title</label>
+                    <p className="text-sm bg-gray-50 p-2 rounded">{meeting.title}</p>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium mb-1">API Secret</label>
-                    <Input
-                      type="password"
-                      value={zoomSettings.apiSecret}
-                      onChange={(e) => setZoomSettings(prev => ({ ...prev, apiSecret: e.target.value }))}
-                      placeholder="Your Zoom API Secret"
-                    />
+                    <label className="block text-sm font-medium mb-1">Scheduled Time</label>
+                    <p className="text-sm bg-gray-50 p-2 rounded">
+                      {new Date(meeting.scheduledTime).toLocaleString()}
+                    </p>
                   </div>
                 </div>
-              </div>
-              
-              <div className="space-y-4">
-                <h3 className="font-medium">Default Meeting Settings</h3>
-                
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium mb-1">Duration</label>
+                    <p className="text-sm bg-gray-50 p-2 rounded">{meeting.duration} minutes</p>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-1">Participants</label>
+                    <p className="text-sm bg-gray-50 p-2 rounded">{meeting.participantCount} people</p>
+                  </div>
+                </div>
+
                 <div>
-                  <label className="block text-sm font-medium mb-2">Default Duration (minutes)</label>
-                  <Input
-                    type="number"
-                    value={zoomSettings.defaultDuration}
-                    onChange={(e) => setZoomSettings(prev => ({ ...prev, defaultDuration: parseInt(e.target.value) || 60 }))}
-                    min="15"
-                    max="180"
-                  />
-                </div>
-                
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium">Auto Record Meetings</span>
-                    <input
-                      type="checkbox"
-                      checked={zoomSettings.autoRecord}
-                      onChange={(e) => setZoomSettings(prev => ({ ...prev, autoRecord: e.target.checked }))}
-                      className="h-4 w-4 text-orange-500"
-                    />
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium">Enable Waiting Room</span>
-                    <input
-                      type="checkbox"
-                      checked={zoomSettings.waitingRoom}
-                      onChange={(e) => setZoomSettings(prev => ({ ...prev, waitingRoom: e.target.checked }))}
-                      className="h-4 w-4 text-orange-500"
-                    />
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium">Mute Participants on Entry</span>
-                    <input
-                      type="checkbox"
-                      checked={zoomSettings.muteOnEntry}
-                      onChange={(e) => setZoomSettings(prev => ({ ...prev, muteOnEntry: e.target.checked }))}
-                      className="h-4 w-4 text-orange-500"
-                    />
+                  <label className="block text-sm font-medium mb-1">Zoom Link</label>
+                  <div className="flex items-center space-x-2">
+                    <Input value={meeting.zoomLink} readOnly className="bg-gray-50" />
+                    <Button size="sm" variant="outline" onClick={() => navigator.clipboard.writeText(meeting.zoomLink)}>
+                      <Copy className="h-4 w-4" />
+                    </Button>
                   </div>
                 </div>
-              </div>
-              
-              <Button className="w-full bg-orange-500 hover:bg-orange-600">
-                <Settings className="h-4 w-4 mr-2" />
-                Save Settings
-              </Button>
-            </CardContent>
-          </Card>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium mb-1">Meeting ID</label>
+                    <p className="text-sm bg-gray-50 p-2 rounded font-mono">{meeting.meetingId}</p>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-1">Passcode</label>
+                    <p className="text-sm bg-gray-50 p-2 rounded font-mono">{meeting.passcode}</p>
+                  </div>
+                </div>
+
+                <div className="border-t pt-4">
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="font-medium">Notifications</h3>
+                    <Button 
+                      onClick={sendNotifications}
+                      disabled={notifications.emailSent}
+                      className="bg-green-600 hover:bg-green-700"
+                    >
+                      <Send className="h-4 w-4 mr-2" />
+                      {notifications.emailSent ? 'Notifications Sent' : 'Send to All Participants'}
+                    </Button>
+                  </div>
+                  
+                  {notifications.emailSent && (
+                    <div className="space-y-2">
+                      <div className="flex items-center space-x-2 text-sm text-green-600">
+                        <CheckCircle className="h-4 w-4" />
+                        <span>Email notifications sent to all participants</span>
+                      </div>
+                      <div className="flex items-center space-x-2 text-sm text-green-600">
+                        <CheckCircle className="h-4 w-4" />
+                        <span>In-app notifications delivered</span>
+                      </div>
+                      <div className="flex items-center space-x-2 text-sm text-green-600">
+                        <CheckCircle className="h-4 w-4" />
+                        <span>Reminder notifications scheduled</span>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          ) : (
+            <Card>
+              <CardHeader>
+                <CardTitle>No Meeting Created</CardTitle>
+                <CardDescription>
+                  Create a meeting first to view details
+                </CardDescription>
+              </CardHeader>
+            </Card>
+          )}
         </TabsContent>
+
+        <TabsContent value="participants" className="space-y-6">
+          <div className="flex items-center justify-between">
+            <h3 className="text-lg font-medium">Qualified Participants ({participantsData.length})</h3>
+            <Badge variant="outline">
+              Round 3 - Interview Stage
+            </Badge>
+          </div>
+
+          <div className="grid gap-4">
+            {participantsData.map((participant) => (
+              <Card key={participant.id}>
+                <CardContent className="p-4">
+                  <div className="flex items-center justify-between">
+                    <div className="space-y-1">
+                      <div className="flex items-center space-x-2">
+                        <h4 className="font-medium">{participant.name}</h4>
+                        <Badge variant="default">
+                          {participant.status}
+                        </Badge>
+                      </div>
+                      <p className="text-sm text-gray-600">{participant.email}</p>
+                      <div className="flex items-center space-x-2 text-xs text-gray-500">
+                        <CheckCircle className="h-3 w-3" />
+                        <span>Passed Round 1 & 2</span>
+                      </div>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      {notifications.emailSent ? (
+                        <div className="flex items-center space-x-1 text-green-600">
+                          <CheckCircle className="h-4 w-4" />
+                          <span className="text-sm">Notified</span>
+                        </div>
+                      ) : (
+                        <Badge variant="outline">Pending notification</Badge>
+                      )}
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+
+          {meeting.status === 'created' && !notifications.emailSent && (
+            <Card className="border-orange-200 bg-orange-50">
+              <CardContent className="p-4">
+                <div className="flex items-center space-x-2 text-orange-800">
+                  <AlertCircle className="h-4 w-4" />
+                  <span className="text-sm font-medium">
+                    Meeting created but participants haven't been notified yet
+                  </span>
+                </div>
+                <p className="text-sm text-orange-700 mt-1">
+                  Go to Meeting Details tab to send notifications to all participants
+                </p>
+              </CardContent>
+            </Card>
+          )}
+        </TabsContent>
+
+
       </Tabs>
     </div>
   );

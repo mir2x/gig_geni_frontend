@@ -173,7 +173,7 @@ export default function CompetitionManagePage() {
   };
 
   const handleScheduleInterview = (participantId: string, dateTime: string) => {
-    setParticipants(prev => prev.map(p => 
+    setParticipants((prev:any )=> prev.map((p:any)=> 
       p.id === participantId 
         ? { ...p, round3ScheduledTime: dateTime, round3Status: 'scheduled' }
         : p
@@ -181,7 +181,7 @@ export default function CompetitionManagePage() {
   };
 
   const handleAssignFinalScore = (participantId: string, score: number, rank: number) => {
-    setParticipants(prev => prev.map(p => 
+    setParticipants((prev:any) => prev.map((p:any)     => 
       p.id === participantId 
         ? { ...p, round4Score: score, round4Status: 'completed', finalRank: rank }
         : p
@@ -385,47 +385,61 @@ export default function CompetitionManagePage() {
           {/* Round 1: Quiz Management */}
           <TabsContent value="round1" className="space-y-6">
             <QuizManager
-              questions={questions}
-              participants={participants}
-              onQuestionsChange={setQuestions}
-              onParticipantsChange={setParticipants}
+              competitionId={params.id as string}
+              onQuestionsUpdate={(updatedQuestions) => {
+                // Convert QuizManager Question type to manage page question type
+                const convertedQuestions = updatedQuestions.map(q => ({
+                  id: q.id,
+                  question: q.question,
+                  options: q.options || [],
+                  correctAnswer: typeof q.correctAnswer === 'number' ? q.correctAnswer : 0,
+                  points: q.points
+                }));
+                setQuestions(convertedQuestions);
+              }}
             />
           </TabsContent>
 
           {/* Round 2: Video Review */}
           <TabsContent value="round2" className="space-y-6">
             <VideoReviewManager
-              participants={participants}
-              onParticipantsChange={setParticipants}
+              competitionId={params.id as string}
+              submissions={[]}
+              onStatusUpdate={(submissionId, status, feedback, rating) => {
+                console.log('Video review updated:', { submissionId, status, feedback, rating });
+              }}
             />
           </TabsContent>
 
           {/* Round 3: Interview Scheduling */}
           <TabsContent value="round3" className="space-y-6">
             <ZoomScheduler
-              participants={participants}
-              onParticipantsChange={setParticipants}
-              zoomLink={zoomLink}
-              onZoomLinkChange={setZoomLink}
+              competitionId={params.id as string}
+              participants={[]}
+              onScheduleUpdate={(participantId, meetingData) => {
+                console.log('Schedule updated:', { participantId, meetingData });
+              }}
             />
           </TabsContent>
 
           {/* Round 4: Final Evaluation */}
           <TabsContent value="round4" className="space-y-6">
             <FinalEvaluation
-              participants={participants}
-              onParticipantsChange={setParticipants}
-              competition={competition}
+              competitionId={params.id as string}
+              participants={[]}
+              onEvaluationComplete={(results) => {
+                console.log('Evaluation completed:', results);
+              }}
             />
           </TabsContent>
 
           {/* Participants Tab */}
           <TabsContent value="participants" className="space-y-6">
             <ParticipantTracker 
-              competitionId={params.id}
-              participants={participants}
+              competitionId={params.id as string}
+              participants={[]}
               onParticipantUpdate={(participantId, updates) => {
-                console.log('Updating participant:', participantId, updates);
+                console.log('Participant updated:', { participantId, updates });
               }}
             />
           </TabsContent>
@@ -433,10 +447,10 @@ export default function CompetitionManagePage() {
           {/* Notifications Tab */}
           <TabsContent value="notifications" className="space-y-6">
             <NotificationSystem 
-              competitionId={params.id}
-              participants={participants}
+              competitionId={params.id as string}
+              participants={[]}
               onSendNotification={(notification) => {
-                console.log('Sending notification:', notification);
+                console.log('Notification sent:', notification);
               }}
             />
           </TabsContent>
