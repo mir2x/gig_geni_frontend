@@ -598,3 +598,296 @@ export const skillSuggestions = {
   'Business & Strategy': ['Business Analysis', 'Project Management', 'Strategic Planning', 'Leadership'],
   'Finance & Accounting': ['Financial Analysis', 'Accounting', 'Excel', 'Financial Modeling', 'Budgeting']
 };
+
+// Leaderboard Mock Data
+import { LeaderboardParticipant, Achievement, CompetitionHistory, RoundScore } from './interface';
+
+export const mockAchievements: Achievement[] = [
+  {
+    id: 'ach1',
+    title: 'First Victory',
+    description: 'Won your first competition',
+    icon: '🏆',
+    earnedDate: new Date('2024-01-15'),
+    category: 'IT & Technology',
+    rarity: 'common'
+  },
+  {
+    id: 'ach2',
+    title: 'Hat Trick',
+    description: 'Won 3 competitions in a row',
+    icon: '🎯',
+    earnedDate: new Date('2024-03-20'),
+    category: 'IT & Technology',
+    rarity: 'rare'
+  },
+  {
+    id: 'ach3',
+    title: 'Perfect Score',
+    description: 'Achieved 100% in a competition round',
+    icon: '💯',
+    earnedDate: new Date('2024-02-10'),
+    category: 'Design & Creative',
+    rarity: 'epic'
+  },
+  {
+    id: 'ach4',
+    title: 'Speed Demon',
+    description: 'Completed challenge in record time',
+    icon: '⚡',
+    earnedDate: new Date('2024-04-05'),
+    category: 'IT & Technology',
+    rarity: 'rare'
+  },
+  {
+    id: 'ach5',
+    title: 'Mentor',
+    description: 'Helped 10+ participants improve',
+    icon: '🎓',
+    earnedDate: new Date('2024-05-12'),
+    category: 'Business & Strategy',
+    rarity: 'epic'
+  },
+  {
+    id: 'ach6',
+    title: 'Legend',
+    description: 'Top 1% performer across all categories',
+    icon: '👑',
+    earnedDate: new Date('2024-06-01'),
+    category: 'All',
+    rarity: 'legendary'
+  }
+];
+
+export const mockLeaderboardData: LeaderboardParticipant[] = [
+  {
+    id: 'p1',
+    name: 'Sarah Johnson',
+    email: 'sarah.johnson@email.com',
+    profilePhoto: 'https://images.unsplash.com/photo-1494790108755-2616b612b786?w=150&h=150&fit=crop&crop=face',
+    role: 'Senior Full Stack Developer',
+    company: 'TechCorp Solutions',
+    totalPoints: 2850,
+    competitionsParticipated: 12,
+    competitionsWon: 5,
+    achievements: [mockAchievements[0], mockAchievements[1], mockAchievements[3], mockAchievements[5]],
+    competitionHistory: [
+      {
+        competitionId: '1',
+        competitionTitle: 'Full Stack Developer Challenge',
+        category: 'IT & Technology',
+        participatedDate: new Date('2024-01-15'),
+        finalRank: 1,
+        totalParticipants: 234,
+        pointsEarned: 450,
+        roundScores: [
+          { roundNumber: 1, roundType: 'Quiz', score: 95, maxScore: 100, completedDate: new Date('2024-01-16') },
+          { roundNumber: 2, roundType: 'Coding Challenge', score: 88, maxScore: 100, completedDate: new Date('2024-01-20') },
+          { roundNumber: 3, roundType: 'System Design', score: 92, maxScore: 100, completedDate: new Date('2024-01-25') },
+          { roundNumber: 4, roundType: 'Technical Interview', score: 96, maxScore: 100, completedDate: new Date('2024-01-30') }
+        ],
+        status: 'completed'
+      }
+    ],
+    joinedDate: new Date('2023-12-01'),
+    lastActive: new Date('2024-12-15'),
+    categories: ['IT & Technology'],
+    skills: ['React', 'Node.js', 'TypeScript', 'AWS'],
+    rank: 1
+  },
+  {
+    id: 'p2',
+    name: 'Michael Chen',
+    email: 'michael.chen@email.com',
+    profilePhoto: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face',
+    role: 'Digital Marketing Specialist',
+    company: 'Marketing Masters Inc',
+    totalPoints: 2720,
+    competitionsParticipated: 10,
+    competitionsWon: 4,
+    achievements: [mockAchievements[0], mockAchievements[2], mockAchievements[4]],
+    competitionHistory: [
+      {
+        competitionId: '2',
+        competitionTitle: 'Digital Marketing Campaign Contest',
+        category: 'Marketing & Sales',
+        participatedDate: new Date('2024-02-10'),
+        finalRank: 1,
+        totalParticipants: 156,
+        pointsEarned: 420,
+        roundScores: [
+          { roundNumber: 1, roundType: 'Strategy Planning', score: 90, maxScore: 100, completedDate: new Date('2024-02-12') },
+          { roundNumber: 2, roundType: 'Campaign Creation', score: 94, maxScore: 100, completedDate: new Date('2024-02-18') },
+          { roundNumber: 3, roundType: 'Analytics Review', score: 87, maxScore: 100, completedDate: new Date('2024-02-25') }
+        ],
+        status: 'completed'
+      }
+    ],
+    joinedDate: new Date('2023-11-15'),
+    lastActive: new Date('2024-12-14'),
+    categories: ['Marketing & Sales'],
+    skills: ['SEO', 'Google Analytics', 'Social Media', 'Content Strategy'],
+    rank: 2
+  },
+  {
+    id: 'p3',
+    name: 'Emily Rodriguez',
+    email: 'emily.rodriguez@email.com',
+    profilePhoto: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face',
+    role: 'UX/UI Designer',
+    company: 'Design Studio Pro',
+    totalPoints: 2650,
+    competitionsParticipated: 8,
+    competitionsWon: 3,
+    achievements: [mockAchievements[0], mockAchievements[2]],
+    competitionHistory: [
+      {
+        competitionId: '4',
+        competitionTitle: 'UX/UI Design Challenge',
+        category: 'Design & Creative',
+        participatedDate: new Date('2024-03-05'),
+        finalRank: 2,
+        totalParticipants: 89,
+        pointsEarned: 380,
+        roundScores: [
+          { roundNumber: 1, roundType: 'User Research', score: 92, maxScore: 100, completedDate: new Date('2024-03-07') },
+          { roundNumber: 2, roundType: 'Wireframing', score: 88, maxScore: 100, completedDate: new Date('2024-03-12') },
+          { roundNumber: 3, roundType: 'Prototype', score: 95, maxScore: 100, completedDate: new Date('2024-03-18') }
+        ],
+        status: 'completed'
+      }
+    ],
+    joinedDate: new Date('2024-01-10'),
+    lastActive: new Date('2024-12-13'),
+    categories: ['Design & Creative'],
+    skills: ['Figma', 'User Research', 'Prototyping', 'Adobe Creative Suite'],
+    rank: 3
+  },
+  {
+    id: 'p4',
+    name: 'David Kim',
+    email: 'david.kim@email.com',
+    profilePhoto: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face',
+    role: 'Business Analyst',
+    company: 'Strategic Solutions Ltd',
+    totalPoints: 2580,
+    competitionsParticipated: 9,
+    competitionsWon: 2,
+    achievements: [mockAchievements[0], mockAchievements[4]],
+    competitionHistory: [
+      {
+        competitionId: '5',
+        competitionTitle: 'Business Strategy Challenge',
+        category: 'Business & Strategy',
+        participatedDate: new Date('2024-04-01'),
+        finalRank: 3,
+        totalParticipants: 67,
+        pointsEarned: 350,
+        roundScores: [
+          { roundNumber: 1, roundType: 'Case Study', score: 85, maxScore: 100, completedDate: new Date('2024-04-03') },
+          { roundNumber: 2, roundType: 'Market Analysis', score: 91, maxScore: 100, completedDate: new Date('2024-04-08') },
+          { roundNumber: 3, roundType: 'Strategy Presentation', score: 89, maxScore: 100, completedDate: new Date('2024-04-15') }
+        ],
+        status: 'completed'
+      }
+    ],
+    joinedDate: new Date('2023-10-20'),
+    lastActive: new Date('2024-12-12'),
+    categories: ['Business & Strategy'],
+    skills: ['Business Analysis', 'Strategic Planning', 'Data Analysis', 'Project Management'],
+    rank: 4
+  },
+  {
+    id: 'p5',
+    name: 'Lisa Thompson',
+    email: 'lisa.thompson@email.com',
+    profilePhoto: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150&h=150&fit=crop&crop=face',
+    role: 'Sales Manager',
+    company: 'SalesForce Elite',
+    totalPoints: 2480,
+    competitionsParticipated: 7,
+    competitionsWon: 3,
+    achievements: [mockAchievements[0], mockAchievements[3]],
+    competitionHistory: [
+      {
+        competitionId: '3',
+        competitionTitle: 'Sales Excellence Championship',
+        category: 'Marketing & Sales',
+        participatedDate: new Date('2024-05-10'),
+        finalRank: 1,
+        totalParticipants: 89,
+        pointsEarned: 400,
+        roundScores: [
+          { roundNumber: 1, roundType: 'Product Knowledge', score: 93, maxScore: 100, completedDate: new Date('2024-05-12') },
+          { roundNumber: 2, roundType: 'Role Play', score: 89, maxScore: 100, completedDate: new Date('2024-05-17') },
+          { roundNumber: 3, roundType: 'Client Presentation', score: 96, maxScore: 100, completedDate: new Date('2024-05-22') }
+        ],
+        status: 'completed'
+      }
+    ],
+    joinedDate: new Date('2024-02-01'),
+    lastActive: new Date('2024-12-11'),
+    categories: ['Marketing & Sales'],
+    skills: ['Sales Strategy', 'CRM', 'Negotiation', 'Client Relations'],
+    rank: 5
+  }
+];
+
+// Additional participants for pagination testing
+export const extendedLeaderboardData: LeaderboardParticipant[] = [
+  ...mockLeaderboardData,
+  {
+    id: 'p6',
+    name: 'Alex Johnson',
+    email: 'alex.johnson@email.com',
+    profilePhoto: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&h=150&fit=crop&crop=face',
+    role: 'DevOps Engineer',
+    company: 'CloudTech Inc',
+    totalPoints: 2350,
+    competitionsParticipated: 6,
+    competitionsWon: 2,
+    achievements: [mockAchievements[0]],
+    competitionHistory: [],
+    joinedDate: new Date('2024-03-15'),
+    lastActive: new Date('2024-12-10'),
+    categories: ['IT & Technology'],
+    skills: ['AWS', 'Docker', 'Kubernetes', 'CI/CD'],
+    rank: 6
+  },
+  {
+    id: 'p7',
+    name: 'Maria Garcia',
+    email: 'maria.garcia@email.com',
+    profilePhoto: 'https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?w=150&h=150&fit=crop&crop=face',
+    role: 'Product Manager',
+    company: 'Innovation Labs',
+    totalPoints: 2280,
+    competitionsParticipated: 5,
+    competitionsWon: 1,
+    achievements: [mockAchievements[0]],
+    competitionHistory: [],
+    joinedDate: new Date('2024-04-20'),
+    lastActive: new Date('2024-12-09'),
+    categories: ['Business & Strategy'],
+    skills: ['Product Strategy', 'Agile', 'User Stories', 'Roadmapping'],
+    rank: 7
+  },
+  {
+    id: 'p8',
+    name: 'James Wilson',
+    email: 'james.wilson@email.com',
+    profilePhoto: 'https://images.unsplash.com/photo-1519244703995-f4e0f30006d5?w=150&h=150&fit=crop&crop=face',
+    role: 'Data Scientist',
+    company: 'Analytics Pro',
+    totalPoints: 2150,
+    competitionsParticipated: 4,
+    competitionsWon: 1,
+    achievements: [mockAchievements[0]],
+    competitionHistory: [],
+    joinedDate: new Date('2024-05-30'),
+    lastActive: new Date('2024-12-08'),
+    categories: ['IT & Technology'],
+    skills: ['Python', 'Machine Learning', 'SQL', 'Tableau'],
+    rank: 8
+  }
+];
