@@ -1,5 +1,5 @@
 import { NotificationsPage } from '@/components/notifications/NotificationsPage';
-import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
+import { AuthGuard } from '@/components/auth/AuthGuard';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
@@ -9,8 +9,8 @@ export const metadata: Metadata = {
 
 export default function Notifications() {
   return (
-    <ProtectedRoute>
+    <AuthGuard requireAuth={true}>
       <NotificationsPage />
-    </ProtectedRoute>
+    </AuthGuard>
   );
 }

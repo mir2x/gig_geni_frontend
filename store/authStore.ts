@@ -33,7 +33,7 @@ interface AuthState {
   setLoading: (loading: boolean) => void;
   updateUserVerificationStatus: (isEmailVerified: boolean, isProfileComplete?: boolean) => void;
   setTokenAndUser: (token: string) => void;
-
+  getTokenFromCookie: () => string | null;
 }
 
 // Dummy user credentials for testing
@@ -140,7 +140,10 @@ export const useAuthStore = create<AuthState>()(
           // Create JWT token
           const accessToken = createMockJWT(user);
           
-          // Token will be stored in localStorage via Zustand persist
+          // Store token in cookie
+          if (typeof document !== 'undefined') {
+            document.cookie = `auth-token=${accessToken}; path=/; max-age=${24 * 60 * 60}`;
+          }
           
           set({ 
             user, 
@@ -192,7 +195,10 @@ export const useAuthStore = create<AuthState>()(
         // Create JWT token
         const accessToken = createMockJWT(newUser);
         
-        // Token will be stored in localStorage via Zustand persist
+        // Store token in cookie
+        if (typeof document !== 'undefined') {
+          document.cookie = `auth-token=${accessToken}; path=/; max-age=${24 * 60 * 60}`;
+        }
         
         set({ 
           user: newUser, 
@@ -206,6 +212,11 @@ export const useAuthStore = create<AuthState>()(
       },
 
       logout: () => {
+        // Clear token cookie
+        if (typeof document !== 'undefined') {
+          document.cookie = 'auth-token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
+        }
+        
         set({ 
           user: null, 
           accessToken: null,
