@@ -719,8 +719,8 @@ export default function CreateCompetitionPage() {
       <div className="container mx-auto px-6">
         <div className="w-full max-w-7xl mx-auto space-y-8">
           {/* Header */}
-          <div className="flex items-center space-x-6">
-            <Button variant="ghost" onClick={() => router.back()} className="text-sm px-4 py-2">
+          <div className="flex items-center space-x-6 ">
+            <Button variant="ghost" onClick={() => router.back()} className="text-sm px-4 py-2 ">
               <ArrowLeft className="h-4 w-4 mr-2" />
               Back
             </Button>

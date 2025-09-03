@@ -22,12 +22,12 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        <div className="min-h-screen bg-background">
+        <div className="min-h-screen bg-background overflow-x-hidden">
           {/* Desktop Navigation */}
           <DesktopNav />
           
           {/* Main Content */}
-          <main className="pb-20 lg:pb-0">
+          <main className="flex-1">
             {children}
           </main>
           

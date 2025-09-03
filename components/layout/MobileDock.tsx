@@ -3,7 +3,7 @@
 import { useState } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { Home, Trophy, Award, Bell, Menu, Plus, Info, MessageCircle } from "lucide-react"
+import { Home, Trophy, Award, Bell, Menu, Plus, Info, MessageCircle, UserCircle, Settings, FilePlus2, FileCog, Users, Target } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import {
   Sheet,
@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/sheet"
 import { NavLink } from "./NavLink"
 import { AuthModal } from "@/components/auth/AuthModal"
+import { usePathname } from "next/navigation"
 import { EmailVerificationModal } from "@/components/auth/EmailVerificationModal"
 import { useAuthStore } from "@/store/authStore"
 
@@ -24,6 +25,7 @@ export function MobileDock() {
   const [isVerificationModalOpen, setIsVerificationModalOpen] = useState(false);
   const [verificationEmail, setVerificationEmail] = useState('');
   const [isSheetOpen, setIsSheetOpen] = useState(false);
+  const pathname = usePathname();
 
   const handleAuthSuccess = (email: string, needsVerification: boolean) => {
     if (needsVerification) {
@@ -59,42 +61,49 @@ export function MobileDock() {
           {/* Home */}
           <NavLink 
             href="/" 
-            className="flex flex-col items-center p-1 text-xs rounded-lg min-w-0 flex-1"
-            activeClassName="bg-orange-50 text-primary"
+            className={`flex flex-col items-center p-2 text-xs rounded-xl min-w-0 transition-all duration-200 ${
+              pathname === "/" ? "flex-[2] px-3 bg-orange-50 text-primary" : "flex-[2] px-3 hover:bg-gray-100 dark:hover:bg-gray-800"
+            }`}
           >
-            <Home className="h-4 w-4 mb-1 flex-shrink-0" />
-            <span className="truncate text-[10px] leading-tight">Home</span>
+            <Home className="h-5 w-5 mb-1 flex-shrink-0" />
+            <span className="text-[10px] leading-tight font-medium">Home</span>
           </NavLink>
 
           {/* Competitions */}
           <NavLink 
             href="/competitions" 
-            className="flex flex-col items-center p-1 text-xs rounded-lg min-w-0 flex-1"
-            activeClassName="bg-orange-50 text-primary"
+            className={`flex flex-col items-center p-2 text-xs rounded-xl min-w-0 transition-all duration-200 ${
+              pathname === "/competitions" ? "flex-[2] px-3 bg-orange-50 text-primary" : "flex-[2] px-3 hover:bg-gray-100 dark:hover:bg-gray-800"
+            }`}
           >
-            <Trophy className="h-4 w-4 mb-1 flex-shrink-0" />
-            <span className="truncate text-[10px] leading-tight">Compete</span>
+            <Trophy className="h-5 w-5 mb-1 flex-shrink-0" />
+            <span className="text-[10px] leading-tight font-medium">Competitions</span>
           </NavLink>
 
-          {/* Leaderboards */}
-          <NavLink 
-            href="/leaderboards" 
-            className="flex flex-col items-center p-1 text-xs rounded-lg min-w-0 flex-1"
-            activeClassName="bg-orange-50 text-primary"
-          >
-            <Award className="h-4 w-4 mb-1 flex-shrink-0" />
-            <span className="truncate text-[10px] leading-tight">Leaders</span>
-          </NavLink>
+          {/* My Competitions or Create Competition based on user role */}
+          {user && user.role === "employer" ? (
+            <NavLink 
+              href="/competitions/create" 
+              className={`flex flex-col items-center p-2 text-xs rounded-xl min-w-0 transition-all duration-200 ${
+                pathname === "/competitions/create" ? "flex-[2] px-3 bg-orange-50 text-primary" : "flex-[2] px-3 hover:bg-gray-100 dark:hover:bg-gray-800"
+              }`}
+            >
+              <Plus className="h-5 w-5 mb-1 flex-shrink-0" />
+              <span className="text-[10px] leading-tight font-medium">Create</span>
+            </NavLink>
+          ) : (
+            <NavLink 
+              href="/competitions/my" 
+              className={`flex flex-col items-center p-2 text-xs rounded-xl min-w-0 transition-all duration-200 ${
+                pathname === "/competitions/my" ? "flex-[2] px-3 bg-orange-50 text-primary" : "flex-[2] px-3 hover:bg-gray-100 dark:hover:bg-gray-800"
+              }`}
+            >
+              <Target className="h-5 w-5 mb-1 flex-shrink-0" />
+              <span className="text-[10px] leading-tight font-medium">My Competitions</span>
+            </NavLink>
+          )}
 
-          {/* Notifications */}
-          <NavLink 
-            href="/notifications" 
-            className="flex flex-col items-center p-1 text-xs rounded-lg min-w-0 flex-1"
-            activeClassName="bg-orange-50 text-primary"
-          >
-            <Bell className="h-4 w-4 mb-1 flex-shrink-0" />
-            <span className="truncate text-[10px] leading-tight">Alerts</span>
-          </NavLink>
+
 
           {/* Menu */}
           <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
@@ -104,17 +113,58 @@ export function MobileDock() {
                 <span className="truncate text-[10px] leading-tight">Menu</span>
               </Button>
             </SheetTrigger>
-            <SheetContent side="right">
-              <SheetHeader>
-                <SheetTitle>Menu</SheetTitle>
-              </SheetHeader>
-              <div className="flex flex-col space-y-4 mt-6">
-                <Link href="/about" className="text-lg hover:text-primary" onClick={() => setIsSheetOpen(false)}>
-                  About
-                </Link>
-                <Link href="/contact" className="text-lg hover:text-primary" onClick={() => setIsSheetOpen(false)}>
-                  Contact Us
-                </Link>
+            <SheetContent side="right" className="w-80 p-0 bg-white dark:bg-gray-900" onInteractOutside={() => setIsSheetOpen(false)}>
+              <div className="flex flex-col h-full">
+                <div className="p-6 border-b border-gray-200 dark:border-gray-700 bg-gradient-to-r from-[#FC5602]/5 to-[#FF7B02]/5">
+                  {user ? (
+                    <div className="flex items-center gap-3">
+                      <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#FC5602] to-[#FF7B02] flex items-center justify-center text-white font-bold text-lg">
+                        {user.name ? user.name.charAt(0).toUpperCase() : user.email.charAt(0).toUpperCase()}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <h3 className="text-lg font-semibold text-gray-900 dark:text-white truncate">
+                          {user.name || 'User'}
+                        </h3>
+                        <p className="text-sm text-gray-600 dark:text-gray-400 truncate">{user.email}</p>
+                        <span className="inline-block px-2 py-1 text-xs bg-[#FC5602]/10 text-[#FC5602] rounded-full mt-1 capitalize">
+                          {user.role}
+                        </span>
+                      </div>
+                    </div>
+                  ) : (
+                    <div>
+                      <h2 className="text-xl font-bold text-gray-900 dark:text-white">Menu</h2>
+                      <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">Navigate through the app</p>
+                    </div>
+                  )}
+                </div>
+                <div className="flex-1 p-4 pb-20">
+                  <nav className="space-y-2">
+                    <Link href="/leaderboards" className="group flex items-center gap-3 px-4 py-3 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-[#FC5602]/10 hover:text-[#FC5602] transition-all duration-200 border border-transparent hover:border-[#FC5602]/20" onClick={() => setIsSheetOpen(false)}>
+                      <div className="p-1.5 rounded-md bg-gray-100 dark:bg-gray-800 group-hover:bg-[#FC5602]/20 transition-colors">
+                        <Award className="h-4 w-4" />
+                      </div>
+                      <span className="font-medium">Leaderboards</span>
+                    </Link>
+                    <Link href="/about" className="group flex items-center gap-3 px-4 py-3 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-[#FC5602]/10 hover:text-[#FC5602] transition-all duration-200 border border-transparent hover:border-[#FC5602]/20" onClick={() => setIsSheetOpen(false)}>
+                      <div className="p-1.5 rounded-md bg-gray-100 dark:bg-gray-800 group-hover:bg-[#FC5602]/20 transition-colors">
+                        <Info className="h-4 w-4" />
+                      </div>
+                      <span className="font-medium">About</span>
+                    </Link>
+                    <Link href="/notifications" className="group flex items-center gap-3 px-4 py-3 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-[#FC5602]/10 hover:text-[#FC5602] transition-all duration-200 border border-transparent hover:border-[#FC5602]/20" onClick={() => setIsSheetOpen(false)}>
+                      <div className="p-1.5 rounded-md bg-gray-100 dark:bg-gray-800 group-hover:bg-[#FC5602]/20 transition-colors">
+                        <Bell className="h-4 w-4" />
+                      </div>
+                      <span className="font-medium">Notifications</span>
+                    </Link>
+                    <Link href="/contact" className="group flex items-center gap-3 px-4 py-3 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-[#FC5602]/10 hover:text-[#FC5602] transition-all duration-200 border border-transparent hover:border-[#FC5602]/20" onClick={() => setIsSheetOpen(false)}>
+                      <div className="p-1.5 rounded-md bg-gray-100 dark:bg-gray-800 group-hover:bg-[#FC5602]/20 transition-colors">
+                        <MessageCircle className="h-4 w-4" />
+                      </div>
+                      <span className="font-medium">Contact Us</span>
+                    </Link>
+                    <div className="border-t border-gray-200 dark:border-gray-700 my-4"></div>
                 
                 {!user ? (
                   <button 
@@ -127,39 +177,76 @@ export function MobileDock() {
                     Login
                   </button>
                 ) : (
-                  <>
-                    <Link href="/profile" className="text-lg hover:text-primary" onClick={() => setIsSheetOpen(false)}>
-                      Profile
+                  <div className="space-y-2">
+                    <Link href="/profile" className="group flex items-center gap-3 px-4 py-3 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-[#FC5602]/10 hover:text-[#FC5602] transition-all duration-200 border border-transparent hover:border-[#FC5602]/20" onClick={() => setIsSheetOpen(false)}>
+                      <div className="p-1.5 rounded-md bg-gray-100 dark:bg-gray-800 group-hover:bg-[#FC5602]/20 transition-colors">
+                        <UserCircle className="h-4 w-4" />
+                      </div>
+                      <span className="font-medium">Profile</span>
+                    </Link>
+                    <Link href="/settings" className="group flex items-center gap-3 px-4 py-3 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-[#FC5602]/10 hover:text-[#FC5602] transition-all duration-200 border border-transparent hover:border-[#FC5602]/20" onClick={() => setIsSheetOpen(false)}>
+                      <div className="p-1.5 rounded-md bg-gray-100 dark:bg-gray-800 group-hover:bg-[#FC5602]/20 transition-colors">
+                        <Settings className="h-4 w-4" />
+                      </div>
+                      <span className="font-medium">Settings</span>
                     </Link>
                     
                     {user.role === "employer" && (
                       <>
-                        <Link href="/competitions/create" className="text-lg hover:text-primary" onClick={() => setIsSheetOpen(false)}>
-                          Create Competition
-                        </Link>
-                        <Link href="/competitions/manage" className="text-lg hover:text-primary" onClick={() => setIsSheetOpen(false)}>
-                          Manage Competitions
-                        </Link>
-                      </>
+                       <Link href="/competitions/create" className="group flex items-center gap-3 px-4 py-3 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-[#FC5602]/10 hover:text-[#FC5602] transition-all duration-200 border border-transparent hover:border-[#FC5602]/20" onClick={() => setIsSheetOpen(false)}>
+                      <div className="p-1.5 rounded-md bg-gray-100 dark:bg-gray-800 group-hover:bg-[#FC5602]/20 transition-colors">
+                        <FilePlus2 className="h-4 w-4" />
+                      </div>
+                      <span className="font-medium">Create Competition</span>
+                    </Link>
+                    <Link href="/competitions/manage" className="group flex items-center gap-3 px-4 py-3 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-[#FC5602]/10 hover:text-[#FC5602] transition-all duration-200 border border-transparent hover:border-[#FC5602]/20" onClick={() => setIsSheetOpen(false)}>
+                      <div className="p-1.5 rounded-md bg-gray-100 dark:bg-gray-800 group-hover:bg-[#FC5602]/20 transition-colors">
+                        <FileCog className="h-4 w-4" />
+                      </div>
+                      <span className="font-medium">Manage Competitions</span>
+                    </Link>
+                    </>
                     )}
                     
                     {user.role === "employee" && (
                       <>
-                        <Link href="/competitions/join" className="text-lg hover:text-primary" onClick={() => setIsSheetOpen(false)}>
-                          Join Competitions
+                        <Link href="/competitions/join" className="group flex items-center gap-3 px-4 py-3 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-[#FC5602]/10 hover:text-[#FC5602] transition-all duration-200 border border-transparent hover:border-[#FC5602]/20" onClick={() => setIsSheetOpen(false)}>
+                          <div className="p-1.5 rounded-md bg-gray-100 dark:bg-gray-800 group-hover:bg-[#FC5602]/20 transition-colors">
+                            <Users className="h-4 w-4" />
+                          </div>
+                          <span className="font-medium">Join Competitions</span>
                         </Link>
-                        <Link href="/competitions/my" className="text-lg hover:text-primary" onClick={() => setIsSheetOpen(false)}>
-                          My Competitions
+                        <Link href="/competitions/my" className="group flex items-center gap-3 px-4 py-3 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-[#FC5602]/10 hover:text-[#FC5602] transition-all duration-200 border border-transparent hover:border-[#FC5602]/20" onClick={() => setIsSheetOpen(false)}>
+                          <div className="p-1.5 rounded-md bg-gray-100 dark:bg-gray-800 group-hover:bg-[#FC5602]/20 transition-colors">
+                            <Trophy className="h-4 w-4" />
+                          </div>
+                          <span className="font-medium">My Competitions</span>
                         </Link>
                       </>
                     )}
                     
-                    <hr className="my-4" />
-                    <button onClick={handleLogout} className="text-lg hover:text-primary text-left">
-                      Logout
+                    <div className="border-t border-gray-200 dark:border-gray-700 my-4"></div>
+                    <button onClick={handleLogout} className="group flex items-center gap-3 px-4 py-3 rounded-lg text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all duration-200 border border-transparent hover:border-red-200 dark:hover:border-red-800 w-full text-left">
+                      <div className="p-1.5 rounded-md bg-red-100 dark:bg-red-900/30 group-hover:bg-red-200 dark:group-hover:bg-red-900/50 transition-colors">
+                        <UserCircle className="h-4 w-4" />
+                      </div>
+                      <span className="font-medium">Logout</span>
                     </button>
-                  </>
+                  </div>
                 )}
+                  </nav>
+                </div>
+                
+                {/* Close button at bottom */}
+                <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-white dark:from-gray-900 to-transparent">
+                  <Button 
+                    onClick={() => setIsSheetOpen(false)}
+                    variant="outline" 
+                    className="w-full py-3 border-2 border-gray-200 dark:border-gray-700 hover:border-[#FC5602] hover:text-[#FC5602] transition-all duration-200 rounded-xl font-medium"
+                  >
+                    Close Menu
+                  </Button>
+                </div>
               </div>
             </SheetContent>
           </Sheet>
@@ -167,7 +254,7 @@ export function MobileDock() {
       </nav>
       
       {/* Spacer to prevent content from being hidden behind dock */}
-      <div className="h-20" />
+      <div className="h-24" />
 
       {/* Auth Modal */}
       <AuthModal

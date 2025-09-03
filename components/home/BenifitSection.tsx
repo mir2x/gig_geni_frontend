@@ -39,7 +39,7 @@ function BenefitCard({ benefit, index }: BenefitCardProps) {
 
   return (
     <motion.div
-      className="relative w-80 h-72 flex-shrink-0 cursor-pointer"
+      className="relative w-72 sm:w-80 h-72 flex-shrink-0 cursor-pointer"
       initial={{ opacity: 0, y: 30 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
@@ -134,7 +134,7 @@ function HorizontalScrollSection({ title, subtitle, icon: Icon, iconColor, benef
 
   const scroll = (direction: 'left' | 'right') => {
     if (scrollContainerRef.current) {
-      const scrollAmount = 320; // Card width + margin
+      const scrollAmount = window.innerWidth < 640 ? 288 : 320; // Responsive scroll amount
       const newScrollLeft = direction === 'left' 
         ? scrollContainerRef.current.scrollLeft - scrollAmount
         : scrollContainerRef.current.scrollLeft + scrollAmount;

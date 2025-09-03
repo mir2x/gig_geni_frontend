@@ -30,11 +30,11 @@ export function Hero() {
   return (
     <section className="relative overflow-hidden bg-gradient-to-br from-slate-50 via-orange-50/40 to-blue-50/30">
 
-      {/* Enhanced Floating Elements with Animation */}
+      {/* Enhanced Floating Elements with Animation - Mobile Responsive */}
       <motion.div 
         animate={{ 
           y: [0, -20, 0],
-          x: [0, 10, 0],
+          x: [0, 2, 0],
           scale: [1, 1.1, 1]
         }}
         transition={{ 
@@ -42,13 +42,13 @@ export function Hero() {
           repeat: Infinity,
           ease: "easeInOut" 
         }}
-        className="absolute top-20 left-10 w-24 h-24 bg-gradient-to-br from-[#FC5602]/20 to-[#FF7B02]/10 rounded-full blur-xl"
+        className="absolute top-20 left-2 lg:left-10 w-12 h-12 lg:w-24 lg:h-24 bg-gradient-to-br from-[#FC5602]/20 to-[#FF7B02]/10 rounded-full blur-xl"
         style={{ willChange: 'transform' }}
       />
       <motion.div 
         animate={{ 
           y: [0, 15, 0],
-          x: [0, -15, 0],
+          x: [0, -4, 0],
           scale: [1, 0.9, 1]
         }}
         transition={{ 
@@ -57,13 +57,13 @@ export function Hero() {
           ease: "easeInOut",
           delay: 2
         }}
-        className="absolute top-40 right-20 w-36 h-36 bg-gradient-to-br from-blue-500/15 to-purple-500/10 rounded-full blur-xl"
+        className="absolute top-40 right-2 lg:right-20 w-16 h-16 lg:w-36 lg:h-36 bg-gradient-to-br from-blue-500/15 to-purple-500/10 rounded-full blur-xl"
         style={{ willChange: 'transform' }}
       />
       <motion.div 
         animate={{ 
           y: [0, -10, 0],
-          x: [0, 20, 0],
+          x: [0, 4, 0],
           scale: [1, 1.2, 1]
         }}
         transition={{ 
@@ -72,13 +72,13 @@ export function Hero() {
           ease: "easeInOut",
           delay: 4
         }}
-        className="absolute bottom-20 left-20 w-28 h-28 bg-gradient-to-br from-green-500/15 to-[#FC5602]/10 rounded-full blur-xl"
+        className="absolute bottom-20 left-2 lg:left-20 w-16 h-16 lg:w-28 lg:h-28 bg-gradient-to-br from-green-500/15 to-[#FC5602]/10 rounded-full blur-xl"
         style={{ willChange: 'transform' }}
       />
       <motion.div 
         animate={{ 
           y: [0, 25, 0],
-          x: [0, -10, 0],
+          x: [0, -2, 0],
           rotate: [0, 180, 360]
         }}
         transition={{ 
@@ -86,7 +86,7 @@ export function Hero() {
           repeat: Infinity,
           ease: "linear"
         }}
-        className="absolute top-1/2 right-10 w-20 h-20 bg-gradient-to-br from-purple-500/10 to-pink-500/10 rounded-full blur-lg"
+        className="absolute top-1/2 right-2 lg:right-10 w-12 h-12 lg:w-20 lg:h-20 bg-gradient-to-br from-purple-500/10 to-pink-500/10 rounded-full blur-lg"
         style={{ willChange: 'transform' }}
       />
 

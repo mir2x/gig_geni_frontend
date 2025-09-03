@@ -464,7 +464,7 @@ export function AuthModal({ isOpen, onClose, defaultMode = 'login', onVerificati
         <button
           type="button"
           onClick={() => setStep(1)}
-          className="text-orange-600 hover:text-orange-700 text-sm font-medium flex items-center"
+          className="text-orange-600 hover:text-orange-700 text-sm font-medium  flex items-center "
         >
           ← Back to account type
         </button>
