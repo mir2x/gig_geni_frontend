@@ -1,5 +1,5 @@
 import { ProfilePage } from '@/components/profile/ProfilePage';
-import { AuthGuard } from '@/components/auth/AuthGuard';
+import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
@@ -9,8 +9,8 @@ export const metadata: Metadata = {
 
 export default function Profile() {
   return (
-    <AuthGuard requireAuth={true}>
+    <ProtectedRoute>
       <ProfilePage />
-    </AuthGuard>
+    </ProtectedRoute>
   );
 }

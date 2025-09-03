@@ -15,6 +15,7 @@ import {
 import { NavLink } from "./NavLink"
 import { AuthModal } from "@/components/auth/AuthModal"
 import { EmailVerificationModal } from "@/components/auth/EmailVerificationModal"
+import { EmployeeOnly, EmployerOnly } from "@/components/auth/RoleBasedAccess"
 import { useAuthStore } from "@/store/authStore"
 
 export function DesktopNav() {
@@ -123,49 +124,45 @@ export function DesktopNav() {
                   </DropdownMenuItem>
                   <div className="border-t border-gray-200 dark:border-gray-700 my-2"></div>
                   
-                  {user.role === "employer" && (
-                    <>
-                      <DropdownMenuItem asChild className="p-0">
-                        <Link href="/competitions/my" className="flex items-center gap-3 px-3 py-2.5 rounded-md text-gray-700 dark:text-gray-300 hover:bg-[#FC5602]/10 hover:text-[#FC5602] transition-all duration-200 w-full">
-                      <div className="p-1.5 rounded-md bg-gray-100 dark:bg-gray-800 group-hover:bg-[#FC5602]/20 transition-colors">
-                        <FileCog className="h-4 w-4" />
-                      </div>
-                      <span className="font-medium">Manage Competitions</span>
-                    </Link>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem asChild className="p-0">
-                        <Link href="/competitions/create" className="flex items-center gap-3 px-3 py-2.5 rounded-md text-gray-700 dark:text-gray-300 hover:bg-[#FC5602]/10 hover:text-[#FC5602] transition-all duration-200 w-full">
-                      <div className="p-1.5 rounded-md bg-gray-100 dark:bg-gray-800 group-hover:bg-[#FC5602]/20 transition-colors">
-                        <Plus className="h-4 w-4" />
-                      </div>
-                      <span className="font-medium">Create Competitions</span>
-                    </Link>
-                      </DropdownMenuItem>
-                      <div className="border-t border-gray-200 dark:border-gray-700 my-2"></div>
-                    </>
-                  )}
+                  <EmployerOnly>
+                    <DropdownMenuItem asChild className="p-0">
+                      <Link href="/competitions/manage" className="flex items-center gap-3 px-3 py-2.5 rounded-md text-gray-700 dark:text-gray-300 hover:bg-[#FC5602]/10 hover:text-[#FC5602] transition-all duration-200 w-full">
+                        <div className="p-1.5 rounded-md bg-gray-100 dark:bg-gray-800 group-hover:bg-[#FC5602]/20 transition-colors">
+                          <FileCog className="h-4 w-4" />
+                        </div>
+                        <span className="font-medium">Manage Competitions</span>
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild className="p-0">
+                      <Link href="/competitions/create" className="flex items-center gap-3 px-3 py-2.5 rounded-md text-gray-700 dark:text-gray-300 hover:bg-[#FC5602]/10 hover:text-[#FC5602] transition-all duration-200 w-full">
+                        <div className="p-1.5 rounded-md bg-gray-100 dark:bg-gray-800 group-hover:bg-[#FC5602]/20 transition-colors">
+                          <Plus className="h-4 w-4" />
+                        </div>
+                        <span className="font-medium">Create Competitions</span>
+                      </Link>
+                    </DropdownMenuItem>
+                    <div className="border-t border-gray-200 dark:border-gray-700 my-2"></div>
+                  </EmployerOnly>
                   
-                  {user.role === "employee" && (
-                    <>
-                      <DropdownMenuItem asChild className="p-0">
-                        <Link href="/competitions/join" className="flex items-center gap-3 px-3 py-2.5 rounded-md text-gray-700 dark:text-gray-300 hover:bg-[#FC5602]/10 hover:text-[#FC5602] transition-all duration-200 w-full">
-                          <div className="p-1.5 rounded-md bg-gray-100 dark:bg-gray-800 group-hover:bg-[#FC5602]/20 transition-colors">
-                            <Users className="h-4 w-4" />
-                          </div>
-                          <span className="font-medium">Join Competitions</span>
-                        </Link>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem asChild className="p-0">
-                        <Link href="/competitions/my" className="flex items-center gap-3 px-3 py-2.5 rounded-md text-gray-700 dark:text-gray-300 hover:bg-[#FC5602]/10 hover:text-[#FC5602] transition-all duration-200 w-full">
-                          <div className="p-1.5 rounded-md bg-gray-100 dark:bg-gray-800 group-hover:bg-[#FC5602]/20 transition-colors">
-                            <Trophy className="h-4 w-4" />
-                          </div>
-                          <span className="font-medium">My Competitions</span>
-                        </Link>
-                      </DropdownMenuItem>
-                      <div className="border-t border-gray-200 dark:border-gray-700 my-2"></div>
-                    </>
-                  )}
+                  <EmployeeOnly>
+                    <DropdownMenuItem asChild className="p-0">
+                      <Link href="/competitions/join" className="flex items-center gap-3 px-3 py-2.5 rounded-md text-gray-700 dark:text-gray-300 hover:bg-[#FC5602]/10 hover:text-[#FC5602] transition-all duration-200 w-full">
+                        <div className="p-1.5 rounded-md bg-gray-100 dark:bg-gray-800 group-hover:bg-[#FC5602]/20 transition-colors">
+                          <Users className="h-4 w-4" />
+                        </div>
+                        <span className="font-medium">Join Competitions</span>
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild className="p-0">
+                      <Link href="/competitions/my" className="flex items-center gap-3 px-3 py-2.5 rounded-md text-gray-700 dark:text-gray-300 hover:bg-[#FC5602]/10 hover:text-[#FC5602] transition-all duration-200 w-full">
+                        <div className="p-1.5 rounded-md bg-gray-100 dark:bg-gray-800 group-hover:bg-[#FC5602]/20 transition-colors">
+                          <Trophy className="h-4 w-4" />
+                        </div>
+                        <span className="font-medium">My Competitions</span>
+                      </Link>
+                    </DropdownMenuItem>
+                    <div className="border-t border-gray-200 dark:border-gray-700 my-2"></div>
+                  </EmployeeOnly>
                 </>
               )}
               

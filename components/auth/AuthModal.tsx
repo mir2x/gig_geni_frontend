@@ -16,9 +16,11 @@ interface AuthModalProps {
   defaultMode?: 'login' | 'signup';
   onVerificationNeeded?: (email: string) => void;
   onAuthSuccess?: (email: string, needsVerification: boolean) => void;
+  title?: string;
+  subtitle?: string;
 }
 
-export function AuthModal({ isOpen, onClose, defaultMode = 'login', onVerificationNeeded, onAuthSuccess }: AuthModalProps) {
+export function AuthModal({ isOpen, onClose, defaultMode = 'login', onVerificationNeeded, onAuthSuccess, title, subtitle }: AuthModalProps) {
   const [mode, setMode] = useState<'login' | 'signup' | 'userType'>(defaultMode);
   const [step, setStep] = useState(1);
   const [userType, setUserType] = useState<'employee' | 'employer' | 'admin' | null>(null);
@@ -640,6 +642,7 @@ export function AuthModal({ isOpen, onClose, defaultMode = 'login', onVerificati
   );
 
   const getTitle = () => {
+    if (title) return title;
     if (mode === 'login') return 'Welcome Back';
     if (mode === 'signup' && step === 1) return 'Join GiG Geni';
     if (mode === 'signup' && step === 2) return 'Create Your Account';
@@ -647,6 +650,7 @@ export function AuthModal({ isOpen, onClose, defaultMode = 'login', onVerificati
   };
 
   const getSubtitle = () => {
+    if (subtitle) return subtitle;
     if (mode === 'login') return 'Sign in to your GiG Geni account';
     if (mode === 'signup' && step === 1) return 'Choose your account type';
     if (mode === 'signup' && step === 2) return 'Complete your registration';
