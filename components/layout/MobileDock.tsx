@@ -81,26 +81,36 @@ export function MobileDock() {
           </NavLink>
 
           {/* My Competitions or Create Competition based on user role */}
-          {user && user.role === "employer" ? (
-            <NavLink 
-              href="/competitions/create" 
-              className={`flex flex-col items-center p-2 text-xs rounded-xl min-w-0 transition-all duration-200 ${
-                pathname === "/competitions/create" ? "flex-[2] px-2 bg-orange-50 text-primary" : "flex-[2] px-2 hover:bg-orange-50/50 hover:text-primary/70"
-              }`}
-            >
-              <Plus className="h-5 w-5 mb-1 flex-shrink-0" />
-              <span className="text-[10px] leading-tight font-medium">Create</span>
-            </NavLink>
+          {user ? (
+            user.role === "employer" ? (
+              <NavLink 
+                href="/competitions/create" 
+                className={`flex flex-col items-center p-2 text-xs rounded-xl min-w-0 transition-all duration-200 ${
+                  pathname === "/competitions/create" ? "flex-[2] px-2 bg-orange-50 text-primary" : "flex-[2] px-2 hover:bg-orange-50/50 hover:text-primary/70"
+                }`}
+              >
+                <Plus className="h-5 w-5 mb-1 flex-shrink-0" />
+                <span className="text-[10px] leading-tight font-medium">Create</span>
+              </NavLink>
+            ) : (
+              <NavLink 
+                href="/competitions/my" 
+                className={`flex flex-col items-center p-2 text-xs rounded-xl min-w-0 transition-all duration-200 ${
+                  pathname === "/competitions/my" ? "flex-[2] px-2 bg-orange-50 text-primary" : "flex-[2] px-2 hover:bg-orange-50/50 hover:text-primary/70"
+                }`}
+              >
+                <Target className="h-5 w-5 mb-1 flex-shrink-0" />
+                <span className="text-[10px] leading-tight font-medium">My Competitions</span>
+              </NavLink>
+            )
           ) : (
-            <NavLink 
-              href="/competitions/my" 
-              className={`flex flex-col items-center p-2 text-xs rounded-xl min-w-0 transition-all duration-200 ${
-                pathname === "/competitions/my" ? "flex-[2] px-2 bg-orange-50 text-primary" : "flex-[2] px-2 hover:bg-orange-50/50 hover:text-primary/70"
-              }`}
+            <button 
+              onClick={() => setIsAuthModalOpen(true)}
+              className="flex flex-col items-center p-2 text-xs rounded-xl min-w-0 transition-all duration-200 flex-[2] px-2 hover:bg-orange-50/50 hover:text-primary/70"
             >
               <Target className="h-5 w-5 mb-1 flex-shrink-0" />
-              <span className="text-[10px] leading-tight font-medium">My Competitions</span>
-            </NavLink>
+              <span className="text-[10px] leading-tight font-medium">Login</span>
+            </button>
           )}
 
 
@@ -147,24 +157,21 @@ export function MobileDock() {
                       </div>
                       <span className="font-medium">Leaderboards</span>
                     </Link>
-                    <Link href="/about" className="group flex items-center gap-3 px-4 py-3 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-[#FC5602]/10 hover:text-[#FC5602] transition-all duration-200 border border-transparent hover:border-[#FC5602]/20" onClick={() => setIsSheetOpen(false)}>
-                      <div className="p-1.5 rounded-md bg-gray-100 dark:bg-gray-800 group-hover:bg-[#FC5602]/20 transition-colors">
-                        <Info className="h-4 w-4" />
-                      </div>
-                      <span className="font-medium">About</span>
-                    </Link>
-                    <Link href="/notifications" className="group flex items-center gap-3 px-4 py-3 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-[#FC5602]/10 hover:text-[#FC5602] transition-all duration-200 border border-transparent hover:border-[#FC5602]/20" onClick={() => setIsSheetOpen(false)}>
-                      <div className="p-1.5 rounded-md bg-gray-100 dark:bg-gray-800 group-hover:bg-[#FC5602]/20 transition-colors">
-                        <Bell className="h-4 w-4" />
-                      </div>
-                      <span className="font-medium">Notifications</span>
-                    </Link>
                     <Link href="/contact" className="group flex items-center gap-3 px-4 py-3 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-[#FC5602]/10 hover:text-[#FC5602] transition-all duration-200 border border-transparent hover:border-[#FC5602]/20" onClick={() => setIsSheetOpen(false)}>
                       <div className="p-1.5 rounded-md bg-gray-100 dark:bg-gray-800 group-hover:bg-[#FC5602]/20 transition-colors">
                         <MessageCircle className="h-4 w-4" />
                       </div>
                       <span className="font-medium">Contact Us</span>
                     </Link>
+                    
+                    {user && (
+                      <Link href="/notifications" className="group flex items-center gap-3 px-4 py-3 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-[#FC5602]/10 hover:text-[#FC5602] transition-all duration-200 border border-transparent hover:border-[#FC5602]/20" onClick={() => setIsSheetOpen(false)}>
+                        <div className="p-1.5 rounded-md bg-gray-100 dark:bg-gray-800 group-hover:bg-[#FC5602]/20 transition-colors">
+                          <Bell className="h-4 w-4" />
+                        </div>
+                        <span className="font-medium">Notifications</span>
+                      </Link>
+                    )}
                     <div className="border-t border-gray-200 dark:border-gray-700 my-4"></div>
                 
                 {!user ? (
@@ -217,7 +224,7 @@ export function MobileDock() {
                           </div>
                           <span className="font-medium">Join Competitions</span>
                         </Link>
-                        <Link href="/competitions/my" className="group flex items-center gap-3  py-3 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-[#FC5602]/10 hover:text-[#FC5602] transition-all duration-200 border border-transparent hover:border-[#FC5602]/20" onClick={() => setIsSheetOpen(false)}>
+                        <Link href="/competitions/my" className="group flex items-center gap-3 px-4 py-3 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-[#FC5602]/10 hover:text-[#FC5602] transition-all duration-200 border border-transparent hover:border-[#FC5602]/20" onClick={() => setIsSheetOpen(false)}>
                           <div className="p-1.5 rounded-md bg-gray-100 dark:bg-gray-800 group-hover:bg-[#FC5602]/20 transition-colors">
                             <Trophy className="h-4 w-4" />
                           </div>

@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Input } from '@/components/ui/input';
+import { AuthGuard } from '@/components/auth/AuthGuard';
 import {
   Search,
   Calendar,
@@ -115,7 +116,7 @@ const getStatusIcon = (status: string) => {
   }
 };
 
-export default function MyCompetitionsPage() {
+function MyCompetitionsPageContent() {
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
 
@@ -342,5 +343,13 @@ export default function MyCompetitionsPage() {
         )}
       </div>
     </div>
+  );
+}
+
+export default function MyCompetitionsPage() {
+  return (
+    <AuthGuard requireAuth={true}>
+      <MyCompetitionsPageContent />
+    </AuthGuard>
   );
 }

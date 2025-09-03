@@ -80,3 +80,147 @@ export interface LeaderboardFilters {
   page: number;
   limit: number;
 }
+
+// Profile Interfaces
+export interface Experience {
+  id?: string;
+  company?: string;
+  role?: string;
+  startDate?: Date;
+  endDate?: Date;
+  description?: string;
+  isCurrentRole?: boolean;
+}
+
+export interface Education {
+  id?: string;
+  institution?: string;
+  degree?: string;
+  field?: string;
+  startYear?: number;
+  endYear?: number;
+  grade?: string;
+  description?: string;
+}
+
+export interface Training {
+  id?: string;
+  title?: string;
+  provider?: string;
+  date?: Date;
+  description?: string;
+  certificateUrl?: string;
+}
+
+export interface Reference {
+  id?: string;
+  name?: string;
+  relationship?: string;
+  contact?: string;
+  email?: string;
+  company?: string;
+}
+
+export interface ContactInformation {
+  email?: string;
+  phone?: string;
+  linkedin?: string;
+  website?: string;
+}
+
+export interface Address {
+  home?: string;
+  permanent?: string;
+  city?: string;
+  state?: string;
+  country?: string;
+  zipCode?: string;
+}
+
+export interface UserProfile {
+  id: string;
+  name: string;
+  profilePhoto?: string;
+  rating?: number;
+  ovationTag?: string;
+  topRanking?: string;
+  txValue?: number;
+  aboutMe?: string;
+  identityValidation?: string;
+  salaryExpectation?: string;
+  jobPreference?: string;
+  skills: string[];
+  experience: Experience[];
+  education: Education[];
+  personalInformation?: {
+    dateOfBirth?: Date;
+    gender?: string;
+    nationality?: string;
+    languages?: string[];
+  };
+  address?: Address;
+  contactInformation?: ContactInformation;
+  assets: string[];
+  additionalActivity?: string;
+  training: Training[];
+  reference: Reference[];
+  socialLinks: string[];
+  createdAt?: Date;
+  updatedAt?: Date;
+  appliedCompetitions?: Competition[];
+}
+
+export interface EmployerProfile {
+  id: string;
+  companyName: string;
+  companySize?: number;
+  industry?: string;
+  teamMembers?: string[];
+  hiringPreferences?: string[];
+  postedCompetitions: Competition[];
+  companyDescription?: string;
+  website?: string;
+  foundedYear?: number;
+  headquarters?: string;
+}
+
+// Notification Interfaces
+export interface Notification {
+  id: string;
+  title: string;
+  message: string;
+  type: 'info' | 'success' | 'warning' | 'error' | 'competition' | 'system';
+  isRead: boolean;
+  createdAt: Date;
+  actionUrl?: string;
+  actionText?: string;
+  metadata?: {
+    competitionId?: string;
+    userId?: string;
+    [key: string]: any;
+  };
+}
+
+// Settings Interfaces
+export interface NotificationSettings {
+  emailNotifications: boolean;
+  pushNotifications: boolean;
+  competitionUpdates: boolean;
+  leaderboardUpdates: boolean;
+  promotionalEmails: boolean;
+  weeklyDigest: boolean;
+}
+
+export interface UserSettings {
+  notifications: NotificationSettings;
+  privacy: {
+    profileVisibility: 'public' | 'private' | 'connections';
+    showEmail: boolean;
+    showPhone: boolean;
+  };
+  preferences: {
+    theme: 'light' | 'dark' | 'system';
+    language: string;
+    timezone: string;
+  };
+}

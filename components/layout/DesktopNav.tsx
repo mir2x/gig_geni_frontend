@@ -79,11 +79,17 @@ export function DesktopNav() {
                 <>
                   <DropdownMenuItem className="p-0">
                     <button onClick={() => setIsAuthModalOpen(true)} className="flex items-center gap-3 px-3 py-2.5 rounded-md text-gray-700 dark:text-gray-300 hover:bg-[#FC5602]/10 hover:text-[#FC5602] transition-all duration-200 w-full text-left">
+                      <div className="p-1.5 rounded-md bg-gray-100 dark:bg-gray-800 group-hover:bg-[#FC5602]/20 transition-colors">
+                        <User className="h-4 w-4" />
+                      </div>
                       <span className="font-medium">Login</span>
                     </button>
                   </DropdownMenuItem>
                   <DropdownMenuItem className="p-0">
                     <button onClick={() => setIsAuthModalOpen(true)} className="flex items-center gap-3 px-3 py-2.5 rounded-md text-gray-700 dark:text-gray-300 hover:bg-[#FC5602]/10 hover:text-[#FC5602] transition-all duration-200 w-full text-left">
+                      <div className="p-1.5 rounded-md bg-gray-100 dark:bg-gray-800 group-hover:bg-[#FC5602]/20 transition-colors">
+                        <UserCircle className="h-4 w-4" />
+                      </div>
                       <span className="font-medium">Sign Up</span>
                     </button>
                   </DropdownMenuItem>

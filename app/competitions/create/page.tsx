@@ -11,6 +11,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
+import { AuthGuard } from '@/components/auth/AuthGuard';
 import {
   ArrowLeft,
   Plus,
@@ -32,7 +33,7 @@ import { categories, skillSuggestions } from '@/lib/mock-data';
 
 
 
-export default function CreateCompetitionPage() {
+function CreateCompetitionPageContent() {
   const router = useRouter();
   const [currentStep, setCurrentStep] = useState(1);
   const [formData, setFormData] = useState({
@@ -798,5 +799,13 @@ export default function CreateCompetitionPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function CreateCompetitionPage() {
+  return (
+    <AuthGuard requireAuth={true}>
+      <CreateCompetitionPageContent />
+    </AuthGuard>
   );
 }

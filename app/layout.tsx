@@ -4,6 +4,7 @@ import "./globals.css"
 import { DesktopNav } from "@/components/layout/DesktopNav"
 import { MobileDock } from "@/components/layout/MobileDock"
 import { Footer } from "@/components/footer/Footer"
+import { OnboardingProvider } from "@/components/onboarding/OnboardingProvider"
 
 
 const inter = Inter({ subsets: ["latin"] })
@@ -22,21 +23,23 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        <div className="min-h-screen bg-background overflow-x-hidden">
-          {/* Desktop Navigation */}
-          <DesktopNav />
-          
-          {/* Main Content */}
-          <main className="flex-1">
-            {children}
-          </main>
-          
-          {/* Footer */}
-          <Footer />
-          
-          {/* Mobile Navigation Dock */}
-          <MobileDock />
-        </div>
+        <OnboardingProvider>
+          <div className="min-h-screen bg-background overflow-x-hidden">
+            {/* Desktop Navigation */}
+            <DesktopNav />
+            
+            {/* Main Content */}
+            <main className="flex-1">
+              {children}
+            </main>
+            
+            {/* Footer */}
+            <Footer />
+            
+            {/* Mobile Navigation Dock */}
+            <MobileDock />
+          </div>
+        </OnboardingProvider>
       </body>
     </html>
   )

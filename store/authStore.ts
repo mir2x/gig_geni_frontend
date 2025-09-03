@@ -23,6 +23,7 @@ interface RegisterData {
 
 interface AuthState {
   user: User | null;
+  accessToken: string | null;
   isAuthenticated: boolean;
   isLoading: boolean;
   pendingEmailVerification: boolean;
@@ -31,6 +32,8 @@ interface AuthState {
   logout: () => void;
   setLoading: (loading: boolean) => void;
   updateUserVerificationStatus: (isEmailVerified: boolean, isProfileComplete?: boolean) => void;
+  setTokenAndUser: (token: string) => void;
+  getTokenFromCookie: () => string | null;
 }
 
 // Dummy user credentials for testing
@@ -75,10 +78,51 @@ const DUMMY_USERS: Record<string, User> = {
   }
 };
 
+// Helper function to decode JWT token
+function decodeJWT(token: string): any {
+  try {
+    const base64Payload = token.split('.')[1];
+    return JSON.parse(atob(base64Payload));
+  } catch (error) {
+    console.error('Error decoding JWT:', error);
+    return null;
+  }
+}
+
+// Helper function to check if token is expired
+function isTokenExpired(token: string): boolean {
+  try {
+    const payload = decodeJWT(token);
+    if (!payload || !payload.exp) return true;
+    const currentTime = Math.floor(Date.now() / 1000);
+    return payload.exp < currentTime;
+  } catch {
+    return true;
+  }
+}
+
+// Helper function to create a mock JWT token for testing
+function createMockJWT(user: User): string {
+  const header = btoa(JSON.stringify({ alg: 'HS256', typ: 'JWT' }));
+  const payload = btoa(JSON.stringify({
+    sub: user.id,
+    email: user.email,
+    name: user.name,
+    role: user.role,
+    company: user.company,
+    title: user.title,
+    iat: Math.floor(Date.now() / 1000),
+    exp: Math.floor(Date.now() / 1000) + (24 * 60 * 60) // 24 hours
+  }));
+  const signature = btoa('mock-signature');
+  return `${header}.${payload}.${signature}`;
+}
+
 export const useAuthStore = create<AuthState>()(
   persist(
     (set, get) => ({
       user: null,
+      accessToken: null,
       isAuthenticated: false,
       isLoading: false,
       pendingEmailVerification: false,
@@ -93,8 +137,17 @@ export const useAuthStore = create<AuthState>()(
         const user = DUMMY_USERS[email.toLowerCase()];
         
         if (user && password === 'password123') {
+          // Create JWT token
+          const accessToken = createMockJWT(user);
+          
+          // Store token in cookie
+          if (typeof document !== 'undefined') {
+            document.cookie = `auth-token=${accessToken}; path=/; max-age=${24 * 60 * 60}`;
+          }
+          
           set({ 
             user, 
+            accessToken,
             isAuthenticated: true, 
             isLoading: false 
           });
@@ -139,8 +192,17 @@ export const useAuthStore = create<AuthState>()(
         // Add to dummy users (in real app, this would be an API call)
         DUMMY_USERS[data.email.toLowerCase()] = newUser;
         
+        // Create JWT token
+        const accessToken = createMockJWT(newUser);
+        
+        // Store token in cookie
+        if (typeof document !== 'undefined') {
+          document.cookie = `auth-token=${accessToken}; path=/; max-age=${24 * 60 * 60}`;
+        }
+        
         set({ 
           user: newUser, 
+          accessToken,
           isAuthenticated: true, 
           isLoading: false,
           pendingEmailVerification: true
@@ -150,8 +212,14 @@ export const useAuthStore = create<AuthState>()(
       },
 
       logout: () => {
+        // Clear token cookie
+        if (typeof document !== 'undefined') {
+          document.cookie = 'auth-token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
+        }
+        
         set({ 
           user: null, 
+          accessToken: null,
           isAuthenticated: false, 
           isLoading: false,
           pendingEmailVerification: false
@@ -171,17 +239,67 @@ export const useAuthStore = create<AuthState>()(
             ...(isProfileComplete !== undefined && { isProfileComplete })
           };
           
+          // Update the dummy users data as well
+          DUMMY_USERS[currentState.user.email.toLowerCase()] = updatedUser;
+          
           set({
             user: updatedUser,
             pendingEmailVerification: !isEmailVerified
           });
         }
+      },
+
+      setTokenAndUser: (token: string) => {
+        if (isTokenExpired(token)) {
+          // Token is expired, logout
+          get().logout();
+          return;
+        }
+        
+        const payload = decodeJWT(token);
+        if (payload) {
+          const user: User = {
+            id: payload.sub || payload.userId,
+            name: payload.name,
+            email: payload.email,
+            role: payload.role,
+            company: payload.company,
+            title: payload.title,
+            isEmailVerified: payload.isEmailVerified,
+            isProfileComplete: payload.isProfileComplete
+          };
+          
+          set({
+            user,
+            accessToken: token,
+            isAuthenticated: true
+          });
+        }
+      },
+
+      getTokenFromCookie: () => {
+        if (typeof document === 'undefined') return null;
+        
+        try {
+          const cookies = document.cookie.split(';');
+          const authCookie = cookies.find(cookie => cookie.trim().startsWith('auth-token='));
+          
+          if (authCookie) {
+            const cookieValue = authCookie.split('=')[1];
+            return cookieValue || null;
+          }
+        } catch (error) {
+          console.error('Error reading token from cookie:', error);
+        }
+        
+        return null;
       }
     }),
     {
       name: 'auth-storage',
       partialize: (state) => ({ 
         user: state.user, 
+        accessToken: state.accessToken,
         isAuthenticated: state.isAuthenticated,
         pendingEmailVerification: state.pendingEmailVerification
       }),
