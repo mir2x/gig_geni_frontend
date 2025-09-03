@@ -228,7 +228,7 @@
   
   /* Bottom navigation spacing */
   .bottom-nav-safe {
-    padding-bottom: 5rem; /* 80px for bottom nav */
+    padding-bottom: 4rem; /* 64px for bottom nav */
   }
   
   @media (min-width: 768px) {

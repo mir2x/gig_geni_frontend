@@ -226,7 +226,7 @@ export function Footer() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6, delay: 0.5 }}
-          className="bg-white/80 backdrop-blur-sm rounded-2xl border border-gray-200/50 p-8 mb-12"
+          className="bg-white/80 backdrop-blur-sm rounded-2xl border border-gray-200/50 p-8"
         >
           <div className="max-w-2xl mx-auto text-center space-y-4">
             <h3 className="text-2xl font-bold text-gray-900">
