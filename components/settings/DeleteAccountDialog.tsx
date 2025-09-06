@@ -8,7 +8,8 @@ import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Checkbox } from '@/components/ui/checkbox';
 import { AlertTriangle, Trash2 } from 'lucide-react';
-import { useAuthStore } from '@/store/authStore';
+import { useAppDispatch, useAppSelector } from '@/store';
+import { logout, selectUser } from '@/store/slices/authSlice';
 
 interface DeleteAccountDialogProps {
   isOpen: boolean;
@@ -16,7 +17,12 @@ interface DeleteAccountDialogProps {
 }
 
 export function DeleteAccountDialog({ isOpen, onClose }: DeleteAccountDialogProps) {
-  const { user, logout } = useAuthStore();
+  const dispatch = useAppDispatch();
+  const user = useAppSelector(selectUser);
+  
+  const handleLogout = () => {
+    dispatch(logout());
+  };
   const [confirmText, setConfirmText] = useState('');
   const [password, setPassword] = useState('');
   const [confirmations, setConfirmations] = useState({
@@ -55,7 +61,7 @@ export function DeleteAccountDialog({ isOpen, onClose }: DeleteAccountDialogProp
       console.log('Account deletion requested');
       
       // Logout and redirect
-      logout();
+      handleLogout();
       window.location.href = '/';
     } catch (err: any) {
       setError(err.message || 'Failed to delete account');

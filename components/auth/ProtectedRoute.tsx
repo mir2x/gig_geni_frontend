@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
-import { useAuthStore } from '@/store/authStore';
+import { useAppSelector } from '@/store';
+import { selectUser, selectIsAuthenticated } from '@/store/slices/authSlice';
 import { checkRoutePermission } from '@/lib/auth';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -14,7 +15,8 @@ interface ProtectedRouteProps {
 }
 
 export function ProtectedRoute({ children, fallback }: ProtectedRouteProps) {
-  const { user, isAuthenticated } = useAuthStore();
+  const user = useAppSelector(selectUser);
+  const isAuthenticated = useAppSelector(selectIsAuthenticated);
   const pathname = usePathname();
   const [isChecking, setIsChecking] = useState(true);
 

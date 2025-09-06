@@ -20,12 +20,13 @@ import {
   AlertTriangle,
   Save
 } from 'lucide-react';
-import { useAuthStore } from '@/store/authStore';
+import { useAppSelector } from '@/store';
+import { selectUser } from '@/store/slices/authSlice';
 import { ChangePasswordDialog } from './ChangePasswordDialog';
 import { DeleteAccountDialog } from './DeleteAccountDialog';
 
 export function SettingsPage() {
-  const { user } = useAuthStore();
+  const user = useAppSelector(selectUser);
   const [settings, setSettings] = useState({
     notifications: {
       emailNotifications: true,

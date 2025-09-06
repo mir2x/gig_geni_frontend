@@ -8,7 +8,8 @@ import { Input } from '@/components/ui/input';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Eye, EyeOff, Mail, Lock, User, Building, X } from 'lucide-react';
-import { useAuthStore } from '@/store/authStore';
+import { useAppDispatch, useAppSelector } from '@/store';
+import { loginUser, registerUser, selectIsLoading } from '@/store/slices/authSlice';
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -36,7 +37,8 @@ export function AuthModal({ isOpen, onClose, defaultMode = 'login', onVerificati
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [error, setError] = useState('');
   
-  const { login, register, isLoading } = useAuthStore();
+  const dispatch = useAppDispatch();
+  const isLoading = useAppSelector(selectIsLoading);
   const router = useRouter();
 
   const resetForm = () => {
@@ -76,16 +78,16 @@ export function AuthModal({ isOpen, onClose, defaultMode = 'login', onVerificati
     e.preventDefault();
     setError('');
     
-    const result = await login(formData.email, formData.password);
+    const result = await dispatch(loginUser({ email: formData.email, password: formData.password }));
     
-    if (result.success) {
+    if ('payload' in result && result.payload) {
       if (onAuthSuccess) {
         onAuthSuccess(formData.email, false);
       } else {
         handleClose();
         setTimeout(() => {
-          const user = useAuthStore.getState().user;
-          if (user) {
+          if (result.payload && typeof result.payload === 'object' && 'user' in result.payload) {
+            const user = result.payload.user;
             switch (user.role) {
               case 'admin':
                 router.push('/admin');
@@ -103,7 +105,7 @@ export function AuthModal({ isOpen, onClose, defaultMode = 'login', onVerificati
         }, 100);
       }
     } else {
-      setError(result.error || 'Login failed');
+      setError((result as any).error || 'Login failed');
     }
   };
 
@@ -132,15 +134,15 @@ export function AuthModal({ isOpen, onClose, defaultMode = 'login', onVerificati
 
     setError('');
     
-    const result = await register({
+    const result = await dispatch(registerUser({
       email: formData.email,
       password: formData.password,
       name: formData.fullName,
       role: userType,
       companyName: userType === 'employer' ? formData.companyName : undefined
-    });
+    }));
     
-    if (result.success) {
+    if ('payload' in result && result.payload) {
       if (onAuthSuccess) {
         onAuthSuccess(formData.email, true);
       } else {
@@ -150,7 +152,7 @@ export function AuthModal({ isOpen, onClose, defaultMode = 'login', onVerificati
         }
       }
     } else {
-      setError(result.error || 'Registration failed');
+      setError((result as any).error || 'Registration failed');
     }
   };
 
@@ -179,16 +181,16 @@ export function AuthModal({ isOpen, onClose, defaultMode = 'login', onVerificati
     };
     
     setError('');
-    const result = await login(credentials[userType].email, credentials[userType].password);
+    const result = await dispatch(loginUser({ email: credentials[userType].email, password: credentials[userType].password }));
     
-    if (result.success) {
+    if ('payload' in result && result.payload) {
       if (onAuthSuccess) {
         onAuthSuccess(credentials[userType].email, false);
       } else {
         handleClose();
         setTimeout(() => {
-          const user = useAuthStore.getState().user;
-          if (user) {
+          if (result.payload && typeof result.payload === 'object' && 'user' in result.payload) {
+            const user = result.payload.user;
             switch (user.role) {
               case 'admin':
                 router.push('/admin');
@@ -206,7 +208,7 @@ export function AuthModal({ isOpen, onClose, defaultMode = 'login', onVerificati
         }, 100);
       }
     } else {
-      setError(result.error || 'Login failed');
+      setError((result as any).error || 'Login failed');
     }
   };
 

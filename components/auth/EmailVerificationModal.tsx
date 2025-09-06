@@ -16,7 +16,8 @@ import {
     AlertCircle,
     ArrowLeft
 } from 'lucide-react';
-import { useAuthStore } from '@/store/authStore';
+import { useAppDispatch, useAppSelector } from '@/store';
+import { updateUser, selectUser } from '@/store/slices/authSlice';
 
 interface EmailVerificationModalProps {
   isOpen: boolean;
@@ -27,7 +28,12 @@ interface EmailVerificationModalProps {
 
 export function EmailVerificationModal({ isOpen, onClose, email, onBackToAuth }: EmailVerificationModalProps) {
     const router = useRouter();
-    const { user, updateUserVerificationStatus } = useAuthStore();
+    const dispatch = useAppDispatch();
+  const user = useAppSelector(selectUser);
+  
+  const handleUpdateVerificationStatus = (status: boolean) => {
+    dispatch(updateUser({ isEmailVerified: status }));
+  };
     const [otp, setOtp] = useState(['', '', '', '', '', '']);
     const [isVerifying, setIsVerifying] = useState(false);
     const [isResending, setIsResending] = useState(false);
@@ -102,7 +108,7 @@ export function EmailVerificationModal({ isOpen, onClose, email, onBackToAuth }:
             // For demo purposes, accept any 6-digit code
             if (code.length === 6 && user) {
                 localStorage.setItem(`email_verified_${user.id}`, 'true');
-                updateUserVerificationStatus(true, user.isProfileComplete);
+                handleUpdateVerificationStatus(true);
                 setIsVerified(true);
 
                 setTimeout(() => {

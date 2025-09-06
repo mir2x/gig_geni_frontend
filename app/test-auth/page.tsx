@@ -3,12 +3,14 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { useAuthStore } from '@/store/authStore';
+import { useAppSelector } from '@/store';
+import { selectUser, selectIsAuthenticated } from '@/store/slices/authSlice';
 import { EmployeeOnly, EmployerOnly, AdminOnly, AuthenticatedOnly } from '@/components/auth/RoleBasedAccess';
 import Link from 'next/link';
 
 export default function TestAuthPage() {
-  const { user, isAuthenticated } = useAuthStore();
+  const user = useAppSelector(selectUser);
+  const isAuthenticated = useAppSelector(selectIsAuthenticated);
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-4xl">

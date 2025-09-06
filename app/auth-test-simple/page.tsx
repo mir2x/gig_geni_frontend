@@ -2,11 +2,18 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { useAuthStore } from '@/store/authStore';
+import { useAppDispatch, useAppSelector } from '@/store';
+import { logout, selectUser, selectIsAuthenticated } from '@/store/slices/authSlice';
 import Link from 'next/link';
 
 export default function AuthTestSimplePage() {
-  const { user, isAuthenticated, logout } = useAuthStore();
+  const dispatch = useAppDispatch();
+  const user = useAppSelector(selectUser);
+  const isAuthenticated = useAppSelector(selectIsAuthenticated);
+  
+  const handleLogout = () => {
+    dispatch(logout());
+  };
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-2xl">
@@ -43,7 +50,7 @@ export default function AuthTestSimplePage() {
           </div>
 
           {isAuthenticated && (
-            <Button onClick={logout} variant="destructive">
+            <Button onClick={handleLogout} variant="destructive">
               Logout
             </Button>
           )}

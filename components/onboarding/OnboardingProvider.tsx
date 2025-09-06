@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
-import { useAuthStore } from '@/store/authStore';
+import { useAppSelector } from '@/store';
+import { selectUser } from '@/store/slices/authSlice';
 import { useRouteGuard } from '@/hooks/useRouteGuard';
 import { AuthModal } from '@/components/auth/AuthModal';
 import { EmailVerificationModal } from '@/components/auth/EmailVerificationModal';
@@ -12,7 +13,7 @@ interface OnboardingProviderProps {
 }
 
 export function OnboardingProvider({ children }: OnboardingProviderProps) {
-  const { user } = useAuthStore();
+  const user = useAppSelector(selectUser);
   const router = useRouter();
   const pathname = usePathname();
   const [verificationEmail, setVerificationEmail] = useState('');

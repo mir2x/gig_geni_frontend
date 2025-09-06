@@ -16,11 +16,13 @@ import { NavLink } from "./NavLink"
 import { AuthModal } from "@/components/auth/AuthModal"
 import { usePathname } from "next/navigation"
 import { EmailVerificationModal } from "@/components/auth/EmailVerificationModal"
-import { useAuthStore } from "@/store/authStore"
+import { useAppDispatch, useAppSelector } from "@/store";
+import { logout, selectUser } from '@/store/slices/authSlice';
 
 export function MobileDock() {
   const router = useRouter();
-  const { user, logout } = useAuthStore();
+  const dispatch = useAppDispatch();
+  const user = useAppSelector(selectUser);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [isVerificationModalOpen, setIsVerificationModalOpen] = useState(false);
   const [verificationEmail, setVerificationEmail] = useState('');
@@ -49,7 +51,7 @@ export function MobileDock() {
   };
 
   const handleLogout = () => {
-    logout();
+    dispatch(logout());
     setIsSheetOpen(false);
     router.push('/');
   };

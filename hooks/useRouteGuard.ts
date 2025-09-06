@@ -1,15 +1,19 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
-import { useAuthStore } from '@/store/authStore';
+import { useAppSelector } from '@/store';
+import { selectUser, selectIsAuthenticated } from '@/store/slices/authSlice';
 import { checkRoutePermission } from '@/lib/auth';
 
 export function useRouteGuard() {
-  const { user, isAuthenticated } = useAuthStore();
+  const user = useAppSelector(selectUser);
+  const isAuthenticated = useAppSelector(selectIsAuthenticated);
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
+  const [shouldShowLoginModal, setShouldShowLoginModal] = useState(false);
+  const [intendedPath, setIntendedPath] = useState<string | null>(null);
 
   useEffect(() => {
     // Handle redirect after login
@@ -44,13 +48,36 @@ export function useRouteGuard() {
     // Client-side route protection check
     const permission = checkRoutePermission(pathname, user);
     if (!permission.allowed && permission.redirectTo) {
-      router.push(permission.redirectTo);
+      // Check if this is a protected route that requires login
+      if (!isAuthenticated && permission.redirectTo.includes('login')) {
+        setIntendedPath(pathname);
+        setShouldShowLoginModal(true);
+      } else {
+        router.push(permission.redirectTo);
+      }
     }
   }, [pathname, user, isAuthenticated, router, searchParams]);
+
+  const handleLoginSuccess = () => {
+    setShouldShowLoginModal(false);
+    if (intendedPath) {
+      router.push(intendedPath);
+      setIntendedPath(null);
+    }
+  };
+
+  const handleLoginModalClose = () => {
+    setShouldShowLoginModal(false);
+    setIntendedPath(null);
+  };
 
   return {
     isAllowed: checkRoutePermission(pathname, user).allowed,
     user,
-    isAuthenticated
+    isAuthenticated,
+    shouldShowLoginModal,
+    intendedPath,
+    handleLoginSuccess,
+    handleLoginModalClose
   };
 }

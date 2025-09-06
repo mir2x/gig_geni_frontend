@@ -1,4 +1,4 @@
-import { User } from '@/store/authStore';
+import { User } from '@/types';
 
 export type UserRole = 'admin' | 'employer' | 'employee';
 

@@ -1,7 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useAuthStore } from '@/store/authStore';
+import { useAppSelector } from '@/store';
+import { selectUser } from '@/store/slices/authSlice';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
@@ -19,7 +20,7 @@ import { useProfileData } from '@/hooks/useProfileData';
 import { EmployerProfile, UserProfile } from '@/lib/interface';
 
 export function ProfilePage() {
-  const { user } = useAuthStore();
+  const user = useAppSelector(selectUser);
   const { profile, updateProfile, isLoading } = useProfileData();
   const [isEditing, setIsEditing] = useState(false);
   const [activeTab, setActiveTab] = useState('personal');

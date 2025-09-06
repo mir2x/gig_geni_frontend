@@ -12,16 +12,14 @@ export const metadata: Metadata = {
 'use client';
 
 import { useSearchParams } from 'next/navigation';
-import { Card, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
+
+import { useAppSelector } from '@/store';
+import { selectUser } from '@/store/slices/authSlice';
 import { Badge } from '@/components/ui/badge';
-import { AlertTriangle, ArrowLeft, Home } from 'lucide-react';
-import Link from 'next/link';
-import { useAuthStore } from '@/store/authStore';
 
 export default function AccessDeniedPage() {
   const searchParams = useSearchParams();
-  const { user } = useAuthStore();
+  const user = useAppSelector(selectUser);
   
   const requiredRole = searchParams.get('required_role');
   const userRole = searchParams.get('user_role');

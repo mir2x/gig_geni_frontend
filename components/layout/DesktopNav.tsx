@@ -15,11 +15,13 @@ import {
 import { NavLink } from "./NavLink"
 import { AuthModal } from "@/components/auth/AuthModal"
 import { EmailVerificationModal } from "@/components/auth/EmailVerificationModal"
-import { useAuthStore } from "@/store/authStore"
+import { useAppDispatch, useAppSelector } from "@/store";
+import { logout, selectUser } from '@/store/slices/authSlice';
 
 export function DesktopNav() {
   const router = useRouter()
-  const { user, logout } = useAuthStore()
+  const dispatch = useAppDispatch();
+  const user = useAppSelector(selectUser);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false)
   const [isVerificationModalOpen, setIsVerificationModalOpen] = useState(false)
   const [verificationEmail, setVerificationEmail] = useState('')
@@ -45,7 +47,7 @@ export function DesktopNav() {
   }
 
   const handleLogout = () => {
-    logout()
+    dispatch(logout());
     router.push('/')
   }
 

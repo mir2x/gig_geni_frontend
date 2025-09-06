@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useAuthStore } from '@/store/authStore';
+import { useAppSelector } from '@/store';
+import { selectUser, selectIsAuthenticated } from '@/store/slices/authSlice';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { AlertCircle, Lock, UserX } from 'lucide-react';
@@ -21,7 +22,8 @@ export function AuthGuard({
   allowedRoles = [], 
   fallback 
 }: AuthGuardProps) {
-  const { user, isAuthenticated } = useAuthStore();
+  const user = useAppSelector(selectUser);
+  const isAuthenticated = useAppSelector(selectIsAuthenticated);
   const router = useRouter();
   const searchParams = useSearchParams();
   const [showAuthModal, setShowAuthModal] = useState(false);
@@ -151,7 +153,8 @@ export function AuthGuard({
 
 // Hook for checking authentication and roles
 export function useAuthGuard() {
-  const { user, isAuthenticated } = useAuthStore();
+  const user = useAppSelector(selectUser);
+  const isAuthenticated = useAppSelector(selectIsAuthenticated);
   
   const hasRole = (roles: ('admin' | 'employer' | 'employee')[]) => {
     if (!isAuthenticated || !user) return false;

@@ -1,6 +1,7 @@
 'use client';
 
-import { useAuthStore } from '@/store/authStore';
+import { useAppSelector } from '@/store';
+import { selectUser } from '@/store/slices/authSlice';
 import { UserRole } from '@/lib/auth';
 
 interface RoleBasedAccessProps {
@@ -10,7 +11,7 @@ interface RoleBasedAccessProps {
 }
 
 export function RoleBasedAccess({ allowedRoles, children, fallback = null }: RoleBasedAccessProps) {
-  const { user } = useAuthStore();
+  const user = useAppSelector(selectUser);
 
   if (!user || !allowedRoles.includes(user.role)) {
     return <>{fallback}</>;

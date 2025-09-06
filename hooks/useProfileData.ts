@@ -1,7 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useAuthStore } from '@/store/authStore';
+import { useAppSelector } from '@/store';
+import { selectUser } from '@/store/slices/authSlice';
 import { UserProfile, EmployerProfile } from '@/lib/interface';
 
 // Mock profile data
@@ -114,7 +115,7 @@ const mockEmployerProfile: EmployerProfile = {
 };
 
 export function useProfileData() {
-  const { user } = useAuthStore();
+  const user = useAppSelector(selectUser);
   const [profile, setProfile] = useState<UserProfile | EmployerProfile | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
