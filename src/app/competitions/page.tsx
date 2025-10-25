@@ -46,11 +46,13 @@ export default function CompetitionsPage() {
     isError,
   } = useGetAllCompetitionQuery();
 
+  console.log(allCompetitions);
+
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [priceRange, setPriceRange] = useState(100);
   const [selectedLocation, setSelectedLocation] = useState("all");
-  const [sortBy, setSortBy] = useState("newest");
+  const [sortBy, setSortBy] = useState("default");
   const [showFilters, setShowFilters] = useState(true);
 
   const uniqueLocations = useMemo(() => {
@@ -67,33 +69,33 @@ export default function CompetitionsPage() {
         (competition.description &&
           competition.description.toLowerCase().includes(lowerCaseSearch)) ||
         competition.skillsTested.toLowerCase().includes(lowerCaseSearch);
-      // const matchesCategory =
-      //   selectedCategory === "all" || competition.category === selectedCategory;
       const matchesLocation =
         selectedLocation === "all" || competition.location === selectedLocation;
       return matchesSearch && matchesLocation;
-      // return matchesSearch && matchesCategory && matchesLocation;
     });
 
-    filtered.sort((a, b) => {
-      if (sortBy === "newest")
-        return (
-          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-        );
-      if (sortBy === "participants")
-        return (b.participants?.length || 0) - (a.participants?.length || 0);
-      // Add other sort conditions as needed
-      return 0;
-    });
+    // --- CRITICAL CHANGE: Only sort if the value is NOT 'default' ---
+    if (sortBy !== "default") {
+      // Check for our new default value
+      filtered.sort((a, b) => {
+        if (sortBy === "newest")
+          return (
+            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+          );
+        if (sortBy === "oldest")
+          return (
+            new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+          );
+        if (sortBy === "participants")
+          return (b.totalParticipants || 0) - (a.totalParticipants || 0); // Use totalParticipants
+        // Add other sort conditions as needed
+        return 0;
+      });
+    }
+    // If sortBy IS "default", 'filtered' array is returned in the backend's original order.
 
     return filtered;
-  }, [
-    searchQuery,
-    // selectedCategory,
-    selectedLocation,
-    sortBy,
-    allCompetitions,
-  ]);
+  }, [searchQuery, selectedLocation, sortBy, allCompetitions]);
 
   const formatDate = (dateString: string | undefined) => {
     if (!dateString) return "TBD";
@@ -217,8 +219,13 @@ export default function CompetitionsPage() {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="newest">Newest First</SelectItem>
-                    <SelectItem value="oldest">Oldest First</SelectItem>
+                    {/* ADD THIS AS THE DEFAULT OPTION */}
+                    <SelectItem value="default">
+                      Default (Status/Backend Order)
+                    </SelectItem>
+                    {/* RENAME/Keep other options */}
+                    <SelectItem value="newest">Newest Creation Date</SelectItem>
+                    <SelectItem value="oldest">Oldest Creation Date</SelectItem>
                     <SelectItem value="participants">
                       Most Participants
                     </SelectItem>
