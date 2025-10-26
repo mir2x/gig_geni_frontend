@@ -15,6 +15,11 @@ export enum RoundStatus {
   COMPLETED = "completed",
 }
 
+export enum ResultStatus {
+  PENDING = "pending",
+  PUBLISHED = "published",
+}
+
 export interface Participant {
   _id: string;
 
@@ -26,12 +31,14 @@ export interface Participant {
 
   round1_quiz: {
     status: RoundStatus;
+    resultStatus: ResultStatus;
     score?: number;
     attemptId?: string;
   };
 
   round2_video: {
     status: RoundStatus;
+    resultStatus: ResultStatus;
     videoUrl?: string;
     submittedAt?: string;
     feedback?: string;
@@ -39,12 +46,14 @@ export interface Participant {
 
   round3_meeting: {
     status: RoundStatus;
+    resultStatus: ResultStatus;
     meetingId?: string;
     feedback?: string;
   };
 
   round4_task: {
     status: RoundStatus;
+    resultStatus: ResultStatus;
     taskSubmissionId?: string;
     presentationMeetingId?: string;
     feedback?: string;
