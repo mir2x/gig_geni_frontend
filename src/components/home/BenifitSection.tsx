@@ -40,6 +40,7 @@ function BenefitCard({ benefit, index }: BenefitCardProps) {
 
   return (
     <motion.div
+      // RESPONSIVE: w-72 is good for mobile
       className="relative w-72 sm:w-80 h-72 flex-shrink-0 cursor-pointer"
       initial={{ opacity: 0, y: 30 }}
       whileInView={{ opacity: 1, y: 0 }}
@@ -47,7 +48,7 @@ function BenefitCard({ benefit, index }: BenefitCardProps) {
       transition={{ duration: 0.5, delay: index * 0.1 }}
       onHoverStart={() => setIsHovered(true)}
       onHoverEnd={() => setIsHovered(false)}
-      onClick={handleClick}
+      onClick={handleClick} // This ensures mobile tap works
     >
       <div className="w-full h-full border-0 shadow-none transition-all duration-500 overflow-hidden group relative rounded-xl bg-white">
         {/* Background gradient */}
@@ -62,12 +63,14 @@ function BenefitCard({ benefit, index }: BenefitCardProps) {
           transition={{ duration: 0.3 }}
         >
           <div>
+            {/* RESPONSIVE: Made icon box smaller on mobile */}
             <div
-              className={`w-20 h-20 bg-gradient-to-br ${benefit.color} rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300`}
+              className={`w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-br ${benefit.color} rounded-2xl flex items-center justify-center mb-4 sm:mb-6 group-hover:scale-110 transition-transform duration-300`}
             >
-              <benefit.icon className="w-10 h-10 text-white" />
+              <benefit.icon className="w-8 h-8 sm:w-10 sm:h-10 text-white" />
             </div>
-            <h4 className="text-xl font-bold text-gray-900 mb-3">
+            {/* RESPONSIVE: Adjusted text size */}
+            <h4 className="text-lg sm:text-xl font-bold text-gray-900 mb-3">
               {benefit.title}
             </h4>
             <p className="text-gray-600 text-sm leading-relaxed">
@@ -75,12 +78,15 @@ function BenefitCard({ benefit, index }: BenefitCardProps) {
             </p>
           </div>
           <div className="flex items-center text-gray-500 mt-4">
-            <span className="text-sm font-medium">Hover for details</span>
+            {/* RESPONSIVE: Changed text for clarity on touch devices */}
+            <span className="text-sm font-medium">
+              Tap or hover for details
+            </span>
             <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
           </div>
         </motion.div>
 
-        {/* Hover content */}
+        {/* Hover/Tap content */}
         <motion.div
           className="absolute inset-0 p-6 w-full h-full flex flex-col justify-between"
           animate={{ opacity: isActive ? 1 : 0, y: isActive ? 0 : 20 }}
@@ -151,7 +157,7 @@ function HorizontalScrollSection({
 
   const scroll = (direction: "left" | "right") => {
     if (scrollContainerRef.current) {
-      const scrollAmount = window.innerWidth < 640 ? 288 : 320; // Responsive scroll amount
+      const scrollAmount = window.innerWidth < 640 ? 288 : 320; // w-72 + gap
       const newScrollLeft =
         direction === "left"
           ? scrollContainerRef.current.scrollLeft - scrollAmount
@@ -178,21 +184,27 @@ function HorizontalScrollSection({
       className="mb-16"
     >
       {/* Section Header */}
-      <div className="flex items-center justify-between mb-8">
+      {/* RESPONSIVE: Stacks vertically on mobile (flex-col) */}
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-8 gap-4 sm:gap-0">
         <div className="flex items-center space-x-4">
+          {/* RESPONSIVE: Smaller icon box on mobile */}
           <div
-            className={`w-16 h-16 bg-gradient-to-br ${iconColor} rounded-xl flex items-center justify-center`}
+            className={`w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-br ${iconColor} rounded-xl flex items-center justify-center`}
           >
-            <Icon className="w-8 h-8 text-white" />
+            <Icon className="w-6 h-6 sm:w-8 sm:h-8 text-white" />
           </div>
           <div>
-            <h3 className="text-2xl font-bold text-gray-900">{title}</h3>
-            <p className="text-gray-600">{subtitle}</p>
+            {/* RESPONSIVE: Adjusted text size */}
+            <h3 className="text-xl sm:text-2xl font-bold text-gray-900">
+              {title}
+            </h3>
+            <p className="text-gray-600 text-sm sm:text-base">{subtitle}</p>
           </div>
         </div>
 
         {/* Scroll Controls */}
-        <div className="flex space-x-2">
+        {/* RESPONSIVE: Justifies to end on mobile when stacked */}
+        <div className="flex space-x-2 w-full sm:w-auto justify-end">
           <button
             onClick={() => scroll("left")}
             disabled={!canScrollLeft}
@@ -226,7 +238,8 @@ function HorizontalScrollSection({
           onScroll={checkScrollButtons}
           style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
         >
-          <div className="flex space-x-4 min-w-max">
+          {/* RESPONSIVE: Adjusted padding (pr-4) for end of scroll */}
+          <div className="flex space-x-4 min-w-max pr-4">
             {benefits.map((benefit, index) => (
               <BenefitCard
                 key={benefit.title}
@@ -270,7 +283,7 @@ export function BenefitsSection() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.8 }}
-          className="text-center space-y-4 mb-16"
+          className="text-center space-y-4 mb-12 sm:mb-16"
         >
           <Badge
             variant="outline"
@@ -278,10 +291,12 @@ export function BenefitsSection() {
           >
             Why Choose GigGeni?
           </Badge>
+          {/* RESPONSIVE: Text size already responsive */}
           <h2 className="text-4xl md:text-5xl font-bold text-gray-900">
             Benefits for <span className="gradient-text">Everyone</span>
           </h2>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+          {/* RESPONSIVE: Adjusted text size */}
+          <p className="text-lg md:text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
             Our platform revolutionizes hiring by creating win-win situations
             for both job seekers and employers through competitive challenges.
           </p>
@@ -290,7 +305,7 @@ export function BenefitsSection() {
         {/* Employee Benefits Section */}
         <HorizontalScrollSection
           title="For Job Seekers"
-          subtitle="Turn your job search into an exciting competition and get rewarded for your skills."
+          subtitle="Turn your job search into an exciting competition."
           icon={Users}
           iconColor="from-[#FC5602] to-[#FF7B02]"
           benefits={employeeBenefits}
@@ -300,7 +315,7 @@ export function BenefitsSection() {
         {/* Employer Benefits Section */}
         <HorizontalScrollSection
           title="For Employers"
-          subtitle="Find the best talent efficiently through performance-based hiring."
+          subtitle="Find the best talent efficiently."
           icon={Briefcase}
           iconColor="from-purple-500 to-purple-600"
           benefits={employerBenefits}
@@ -313,9 +328,10 @@ export function BenefitsSection() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.8, delay: 0.6 }}
-          className="text-center mt-20"
+          className="text-center mt-16 sm:mt-20"
         >
-          <div className="bg-gradient-to-r from-[#FC5602] to-[#FF7B02] rounded-3xl p-8 lg:p-12 relative overflow-hidden">
+          {/* RESPONSIVE: Adjusted padding for mobile */}
+          <div className="bg-gradient-to-r from-[#FC5602] to-[#FF7B02] rounded-3xl p-6 sm:p-8 lg:p-12 relative overflow-hidden">
             {/* Background decoration */}
             <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent" />
             <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -translate-y-32 translate-x-32" />
@@ -334,20 +350,24 @@ export function BenefitsSection() {
                 </div>
               </motion.div>
 
-              <h3 className="text-3xl lg:text-4xl font-bold text-white mb-4">
+              {/* RESPONSIVE: Adjusted text size */}
+              <h3 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white mb-4">
                 Ready to Transform Your Career?
               </h3>
-              <p className="text-white/90 text-lg mb-8 max-w-2xl mx-auto">
+              {/* RESPONSIVE: Adjusted text size */}
+              <p className="text-base sm:text-lg text-white/90 mb-8 max-w-2xl mx-auto">
                 Join thousands of professionals who have already discovered the
                 power of competitive hiring.
               </p>
 
+              {/* RESPONSIVE: Already stacks on mobile (flex-col) */}
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Link href="/competitions" passHref>
                   <motion.button
                     whileHover={{ scale: 1.05, y: -2 }}
                     whileTap={{ scale: 0.95 }}
-                    className="px-8 py-4 bg-white text-[#FC5602] font-semibold rounded-xl hover:bg-gray-50 transition-all duration-300 shadow-lg hover:shadow-xl"
+                    // RESPONSIVE: Adjusted padding/text for mobile
+                    className="px-6 py-3 sm:px-8 sm:py-4 bg-white text-[#FC5602] font-semibold rounded-xl hover:bg-gray-50 transition-all duration-300 shadow-lg hover:shadow-xl text-base sm:text-lg"
                   >
                     <span className="flex items-center justify-center">
                       Start Competing
@@ -360,7 +380,8 @@ export function BenefitsSection() {
                   <motion.button
                     whileHover={{ scale: 1.05, y: -2 }}
                     whileTap={{ scale: 0.95 }}
-                    className="px-8 py-4 border-2 border-white text-white font-semibold rounded-xl hover:bg-white hover:text-[#FC5602] transition-all duration-300"
+                    // RESPONSIVE: Adjusted padding/text for mobile
+                    className="px-6 py-3 sm:px-8 sm:py-4 border-2 border-white text-white font-semibold rounded-xl hover:bg-white hover:text-[#FC5602] transition-all duration-300 text-base sm:text-lg"
                   >
                     <span className="flex items-center justify-center">
                       Post a Challenge

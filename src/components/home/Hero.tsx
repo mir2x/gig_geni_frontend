@@ -1,3 +1,4 @@
+// components/home/Hero.tsx
 "use client";
 
 import { motion } from "framer-motion";
@@ -24,7 +25,8 @@ interface HeroProps {
 }
 
 const BANNER_IMAGE_PATH = "/images/hero-banner.jpg";
-const BANNER_LINK_URL = "/competitions/68fc0272b956bef70b3c6fc8"; // Replace with your desired link URL
+const MOBILE_BANNER_IMAGE_PATH = "/images/home-banner-mobile.png";
+const BANNER_LINK_URL = "/competitions/68fc0272b956bef70b3c6fc8";
 
 export function Hero({ homeData }: HeroProps) {
   const stats = [
@@ -54,20 +56,30 @@ export function Hero({ homeData }: HeroProps) {
     <section className="relative overflow-hidden">
       <div className="w-full bg-gray-900 shadow-xl mt-4 mb-8">
         <Link href={BANNER_LINK_URL} className="block w-full">
-          <div className="relative w-full h-[400px]">
+          <div className="relative w-full">
+            <Image
+              src={MOBILE_BANNER_IMAGE_PATH}
+              alt="Promotional Banner"
+              width={1000}
+              height={1800}
+              priority
+              className="object-cover w-full h-auto block sm:hidden"
+            />
+
             <Image
               src={BANNER_IMAGE_PATH}
               alt="Promotional Banner"
-              width={1355}
-              height={340}
+              width={1920}
+              height={720}
               priority
-              className="object-cover w-full h-full"
+              className="object-cover w-full h-auto hidden sm:block"
             />
           </div>
         </Link>
       </div>
 
       <div className="bg-gradient-to-br from-slate-50 via-orange-50/40 to-blue-50/30">
+        {/* Animated blobs - already responsive */}
         <motion.div
           animate={{
             y: [0, -20, 0],
@@ -79,7 +91,6 @@ export function Hero({ homeData }: HeroProps) {
             repeat: Infinity,
             ease: "easeInOut",
           }}
-          // Reverted to top-20 to position relative to the start of this div
           className="absolute top-20 left-2 lg:left-10 w-12 h-12 lg:w-24 lg:h-24 bg-gradient-to-br from-[#FC5602]/20 to-[#FF7B02]/10 rounded-full blur-xl"
           style={{ willChange: "transform" }}
         />
@@ -128,7 +139,9 @@ export function Hero({ homeData }: HeroProps) {
           style={{ willChange: "transform" }}
         />
 
-        <div className="container pb-20 relative">
+        {/* RESPONSIVE: Adjusted bottom padding for mobile */}
+        <div className="container pb-16 md:pb-20 relative">
+          {/* RESPONSIVE: Grid is already responsive (stacks on mobile, lg:grid-cols-2) */}
           <div className="grid lg:grid-cols-2 gap-12 items-center min-h-[600px]">
             {/* Left Content */}
             <motion.div
@@ -144,9 +157,10 @@ export function Hero({ homeData }: HeroProps) {
               >
                 <Badge
                   variant="outline"
+                  // RESPONSIVE: Adjusted text size
                   className="bg-[#FC5602]/10 text-[#FC5602] border-[#FC5602]/20 
              hover:bg-[#FC5602]/20 transition-colors 
-             px-4 py-2 text-lg rounded-xl"
+             px-4 py-2 text-base md:text-lg rounded-xl"
                 >
                   <Sparkles className="w-4 h-4 mr-2" />
                   🚀 The Future of Hiring is Here
@@ -160,6 +174,7 @@ export function Hero({ homeData }: HeroProps) {
                 transition={{ delay: 0.3, duration: 0.8 }}
                 className="space-y-4"
               >
+                {/* RESPONSIVE: Text size is already responsive */}
                 <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 leading-tight">
                   Where{" "}
                   <span className="relative">
@@ -168,7 +183,7 @@ export function Hero({ homeData }: HeroProps) {
                       initial={{ width: 0 }}
                       animate={{ width: "100%" }}
                       transition={{ delay: 1, duration: 0.8 }}
-                      className="absolute bottom-2 left-0 h-3 bg-[#FC5602]/20 -z-10"
+                      className="absolute bottom-1 md:bottom-2 left-0 h-2 md:h-3 bg-[#FC5602]/20 -z-10"
                     />
                   </span>{" "}
                   Meets{" "}
@@ -178,12 +193,13 @@ export function Hero({ homeData }: HeroProps) {
                       initial={{ width: 0 }}
                       animate={{ width: "100%" }}
                       transition={{ delay: 1.2, duration: 0.8 }}
-                      className="absolute bottom-2 left-0 h-3 bg-[#FC5602]/20 -z-10"
+                      className="absolute bottom-1 md:bottom-2 left-0 h-2 md:h-3 bg-[#FC5602]/20 -z-10"
                     />
                   </span>
                 </h1>
 
-                <p className="text-xl md:text-2xl text-gray-600 leading-relaxed max-w-2xl">
+                {/* RESPONSIVE: Adjusted text size */}
+                <p className="text-lg md:text-xl text-gray-600 leading-relaxed max-w-2xl">
                   Experience the most engaging and fair hiring process through
                   competitive challenges.
                   <span className="block mt-2 font-semibold text-[#FC5602]">
@@ -197,12 +213,14 @@ export function Hero({ homeData }: HeroProps) {
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.5, duration: 0.6 }}
+                // RESPONSIVE: Already stacks on mobile (flex-col) and goes to row on sm+
                 className="flex flex-col sm:flex-row gap-4"
               >
                 <Link href="/competitions">
                   <Button
                     size="lg"
-                    className="btn-primary group w-full sm:w-auto text-lg px-8 py-4 border border-orange-500  hover:text-orange-500"
+                    // RESPONSIVE: Adjusted text size, padding, and width
+                    className="btn-primary group w-full sm:w-auto text-base md:text-lg px-6 md:px-8 py-3 md:py-4 border border-orange-500 hover:text-orange-500"
                   >
                     Join Competition
                     <Trophy className="ml-2 text-orange-600 h-5 w-5 group-hover:rotate-12 transition-transform duration-300 " />
@@ -213,7 +231,8 @@ export function Hero({ homeData }: HeroProps) {
                   <Button
                     size="lg"
                     variant="outline"
-                    className="btn-outline w-full sm:w-auto text-lg px-8 py-4 group"
+                    // RESPONSIVE: Adjusted text size, padding, and width
+                    className="btn-outline w-full sm:w-auto text-base md:text-lg px-6 md:px-8 py-3 md:py-4 group"
                   >
                     Post Competition
                     <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
@@ -231,7 +250,8 @@ export function Hero({ homeData }: HeroProps) {
                   <div className="w-12 h-12 rounded-full bg-[#FC5602]/10 flex items-center justify-center group-hover:bg-[#FC5602]/20 transition-colors">
                     <Play className="w-5 h-5 text-[#FC5602] ml-0.5" />
                   </div>
-                  <span className="text-lg font-medium">
+                  {/* RESPONSIVE: Adjusted text size */}
+                  <span className="text-base md:text-lg font-medium">
                     Watch how it works
                   </span>
                 </button>
@@ -257,7 +277,8 @@ export function Hero({ homeData }: HeroProps) {
                     repeat: Infinity,
                     ease: "easeInOut",
                   }}
-                  className="bg-white/95 backdrop-blur-sm rounded-2xl shadow-2xl p-8 border border-gray-200/50 ring-1 ring-gray-100/50"
+                  // RESPONSIVE: Adjusted padding for mobile
+                  className="bg-white/95 backdrop-blur-sm rounded-2xl shadow-2xl p-4 sm:p-8 border border-gray-200/50 ring-1 ring-gray-100/50"
                 >
                   <RecentWinnerCarousel winners={winnersData} interval={4000} />
                 </motion.div>
@@ -274,9 +295,10 @@ export function Hero({ homeData }: HeroProps) {
                     ease: "easeInOut",
                     delay: 1,
                   }}
-                  className="absolute -top-4 -right-4 w-16 h-16 bg-[#FC5602] rounded-2xl flex items-center justify-center shadow-lg"
+                  // RESPONSIVE: Adjusted size and position for mobile
+                  className="absolute -top-2 -right-2 md:-top-4 md:-right-4 w-12 h-12 md:w-16 md:h-16 bg-[#FC5602] rounded-2xl flex items-center justify-center shadow-lg"
                 >
-                  <Users className="w-8 h-8 text-white" />
+                  <Users className="w-6 h-6 md:w-8 md:h-8 text-white" />
                 </motion.div>
 
                 <motion.div
@@ -290,9 +312,10 @@ export function Hero({ homeData }: HeroProps) {
                     ease: "easeInOut",
                     delay: 2,
                   }}
-                  className="absolute -bottom-6 -left-6 w-20 h-20 bg-white rounded-2xl flex items-center justify-center shadow-xl border border-gray-100"
+                  // RESPONSIVE: Adjusted size and position for mobile
+                  className="absolute -bottom-4 -left-4 md:-bottom-6 md:-left-6 w-16 h-16 md:w-20 md:h-20 bg-white rounded-2xl flex items-center justify-center shadow-xl border border-gray-100"
                 >
-                  <Target className="w-8 h-8 text-[#FC5602]" />
+                  <Target className="w-6 h-6 md:w-8 md:h-8 text-[#FC5602]" />
                 </motion.div>
               </div>
             </motion.div>
@@ -303,10 +326,13 @@ export function Hero({ homeData }: HeroProps) {
             initial={{ opacity: 0, y: 50 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 1, duration: 0.8 }}
-            className="mt-20"
+            className="mt-16 md:mt-20"
           >
-            <div className="bg-white/80 backdrop-blur-sm rounded-2xl border border-gray-100 shadow-lg p-8">
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+            {/* RESPONSIVE: Adjusted padding for mobile */}
+            <div className="bg-white/80 backdrop-blur-sm rounded-2xl border border-gray-100 shadow-lg p-4 sm:p-6 md:p-8">
+              {/* RESPONSIVE: Already responsive (2 cols on mobile, 4 on md+) */}
+              {/* RESPONSIVE: Adjusted gap for mobile */}
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8">
                 {stats.map((stat, index) => (
                   <motion.div
                     key={stat.label}
@@ -319,7 +345,8 @@ export function Hero({ homeData }: HeroProps) {
                       <stat.icon className="w-6 h-6 text-[#FC5602]" />
                     </div>
                     <div>
-                      <p className="text-3xl font-bold text-gray-900">
+                      {/* RESPONSIVE: Adjusted text size */}
+                      <p className="text-2xl sm:text-3xl font-bold text-gray-900">
                         {stat.value}
                       </p>
                       <p className="text-sm text-gray-600">{stat.label}</p>
