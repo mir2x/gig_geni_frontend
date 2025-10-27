@@ -300,47 +300,30 @@ export default function QuizTakingPageContent() {
   }
 
   if (quizState === "finished" && finalResult) {
-    const { score, message, passed } = finalResult;
     return (
       <Card className="max-w-2xl mx-auto text-center">
         <CardHeader>
-          <div
-            className={`w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 ${
-              passed ? "bg-green-100" : "bg-red-100"
-            }`}
-          >
-            {passed ? (
-              <CheckCircle className="w-8 h-8 text-green-600" />
-            ) : (
-              <XCircle className="w-8 h-8 text-red-600" />
-            )}
+          <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 bg-yellow-100">
+            <Timer className="w-8 h-8 text-yellow-600" />
           </div>
-          <CardTitle className="text-2xl">Quiz Completed!</CardTitle>
+          <CardTitle className="text-2xl">
+            Quiz Submitted Successfully
+          </CardTitle>
+          <CardDescription>
+            Your attempt has been recorded and is currently being evaluated.
+          </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <p className="text-lg font-bold">{message}</p>
-          <p
-            className={`text-5xl font-bold ${
-              passed ? "text-green-600" : "text-red-600"
-            }`}
-          >
-            {score.toFixed(1)}
+          <p className="text-lg font-bold text-gray-700">
+            Official results will be released on:
           </p>
+          <p className="text-5xl font-bold text-primary">November 01, 2025</p>
           <p className="text-sm text-muted-foreground">
-            {passed
-              ? "Congratulations! You have advanced to the next stage."
-              : "Unfortunately, you did not meet the passing score for this round."}
+            Please check the competition journey after this date to view your
+            score and qualification status.
           </p>
-          <Button
-            onClick={() =>
-              router.push(
-                passed
-                  ? `/competitions/${competitionId}/journey`
-                  : "/competitions"
-              )
-            }
-          >
-            {passed ? "Continue to Journey" : "Find Other Competitions"}
+          <Button onClick={() => router.push("/competitions")}>
+            Return to Competitions
           </Button>
         </CardContent>
       </Card>

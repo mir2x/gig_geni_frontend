@@ -289,7 +289,14 @@ export default function CompetitionJourney({
         </CardDescription>
       </CardHeader>
       <CardContent>
-        {participantData?.isWinner && (
+        <Alert className="mb-6 bg-blue-50 border-blue-200">
+          <Calendar className="h-4 w-4 text-blue-600" />
+          <AlertTitle className="text-blue-800">Result Pending</AlertTitle>
+          <AlertDescription className="text-blue-700">
+            The result will be published on <strong>November 01, 2025</strong>.
+          </AlertDescription>
+        </Alert>
+        {/* {participantData?.isWinner && (
           <Alert className="mb-6 bg-green-50 border-green-200">
             <Trophy className="h-4 w-4 text-green-600" />
             <AlertTitle className="text-green-800">Congratulations!</AlertTitle>
@@ -307,7 +314,7 @@ export default function CompetitionJourney({
               round.
             </AlertDescription>
           </Alert>
-        )}
+        )} */}
 
         <div className="relative space-y-8">
           <div className="absolute left-3 top-3 bottom-3 w-0.5 bg-gray-200 rounded" />
