@@ -8,8 +8,9 @@ import { Input } from "@/components/ui/input";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Eye, EyeOff, Mail, Lock } from "lucide-react";
-import { LoginPayload } from "@/types";
+
 import { useLoginMutation } from "@/lib/api/authApi";
+import { LoginPayload } from "@/types";
 
 interface LoginFormProps {
   onClose: () => void;
