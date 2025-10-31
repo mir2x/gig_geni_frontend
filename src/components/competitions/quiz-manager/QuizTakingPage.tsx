@@ -317,7 +317,7 @@ export default function QuizTakingPageContent() {
           <p className="text-lg font-bold text-gray-700">
             Official results will be released on:
           </p>
-          <p className="text-5xl font-bold text-primary">November 01, 2025</p>
+          <p className="text-5xl font-bold text-primary">November 05, 2025</p>
           <p className="text-sm text-muted-foreground">
             Please check the competition journey after this date to view your
             score and qualification status.

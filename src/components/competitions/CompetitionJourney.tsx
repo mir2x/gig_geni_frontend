@@ -293,7 +293,7 @@ export default function CompetitionJourney({
           <Calendar className="h-4 w-4 text-blue-600" />
           <AlertTitle className="text-blue-800">Result Pending</AlertTitle>
           <AlertDescription className="text-blue-700">
-            The result will be published on <strong>November 01, 2025</strong>.
+            The result will be published on <strong>November 05, 2025</strong>.
           </AlertDescription>
         </Alert>
         {/* {participantData?.isWinner && (

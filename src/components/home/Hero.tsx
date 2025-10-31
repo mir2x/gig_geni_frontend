@@ -24,8 +24,8 @@ interface HeroProps {
   homeData?: HomeResponse;
 }
 
-const BANNER_IMAGE_PATH = "/images/hero-banner.jpg";
-const MOBILE_BANNER_IMAGE_PATH = "/images/home-banner-mobile.png";
+const BANNER_IMAGE_PATH = "/images/hero-banner-new.jpg";
+const MOBILE_BANNER_IMAGE_PATH = "/images/hero-banner-new.jpg";
 const BANNER_LINK_URL = "/competitions/68fc0272b956bef70b3c6fc8";
 
 export function Hero({ homeData }: HeroProps) {
