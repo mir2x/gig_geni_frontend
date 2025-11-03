@@ -319,11 +319,7 @@ export default function CompetitionsPage() {
                           </div>
                           <div className="flex items-center">
                             <Users className="h-4 w-4 mr-2" />
-                            {competition._id.toString() ===
-                            "68fc0272b956bef70b3c6fc8"
-                              ? competition.totalParticipants + 205
-                              : competition.totalParticipants}{" "}
-                            participants
+                            {competition.totalParticipants} participants
                           </div>
                           <div className="flex items-center font-semibold text-green-600">
                             <Trophy className="h-4 w-4 mr-2" />

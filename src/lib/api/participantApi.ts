@@ -64,6 +64,7 @@ export const participantApi = baseApi.injectEndpoints({
         params: { competitionId },
       }),
       transformResponse: unwrapResponse<GetParticipantsResponse>,
+      providesTags: ["Participant"],
     }),
   }),
 });
