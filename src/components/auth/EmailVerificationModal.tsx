@@ -62,7 +62,7 @@ export function EmailVerificationModal({
 
     try {
       const result = await verifyOtp({
-        payload: { otp: otpCode },
+        payload: { type: "Verify", otp: otpCode },
         tempToken,
       }).unwrap();
 

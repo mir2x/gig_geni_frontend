@@ -49,6 +49,7 @@ export interface LoginResponse {
 }
 
 export interface VerifyOtpPayload {
+  type: "Verify" | "Reset";
   otp: string;
 }
 
