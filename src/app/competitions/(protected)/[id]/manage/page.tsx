@@ -90,9 +90,7 @@ function CompetitionManagePageContent() {
           <Card>
             <CardContent className="p-6">
               <p className="text-sm text-gray-600">Participants</p>
-              <p className="text-2xl font-bold">
-                {stats!.totalParticipants + 200}
-              </p>
+              <p className="text-2xl font-bold">{stats!.totalParticipants}</p>
             </CardContent>
           </Card>
           <Card>

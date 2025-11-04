@@ -138,7 +138,7 @@ export default function ParticipantTracker({
           <CardContent className="p-4 flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-600">Total</p>
-              <p className="text-2xl font-bold">{stats.total + 200}</p>
+              <p className="text-2xl font-bold">{stats.total}</p>
             </div>
             <Users className="h-8 w-8 text-gray-500" />
           </CardContent>
@@ -157,7 +157,7 @@ export default function ParticipantTracker({
             <div>
               <p className="text-sm font-medium text-gray-600">Eliminated</p>
               <p className="text-2xl font-bold text-red-600">
-                {stats.eliminated + 200}
+                {stats.eliminated}
               </p>
             </div>
             <XCircle className="h-8 w-8 text-red-500" />
