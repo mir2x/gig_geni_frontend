@@ -204,7 +204,6 @@ export function AuthModal({
         className="max-w-md mx-auto p-0 overflow-hidden"
         onInteractOutside={(e) => e.preventDefault()}
         onEscapeKeyDown={(e) => e.preventDefault()}
-        hideCloseButton // We implement our own or rely on UI
       >
         <button
           onClick={onClose}

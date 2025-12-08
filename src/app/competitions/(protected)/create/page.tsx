@@ -3,53 +3,28 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Badge } from "@/components/ui/badge";
-import { Checkbox } from "@/components/ui/checkbox";
-import {
-  ArrowLeft,
-  Plus,
-  X,
-  Trophy,
-  Users,
-  Calendar,
-  DollarSign,
-  Target,
-  FileText,
-  Save,
-  Eye,
-  Upload,
-  File,
-  Image,
-  Trash2,
-  Loader2,
-} from "lucide-react";
-import { categories, skillSuggestions } from "@/lib/mock-data";
-
+import { ArrowLeft, Save, Trophy, Loader2 } from "lucide-react";
 import { toast, Toaster } from "sonner";
 import { useCreateCompetitionMutation } from "@/lib/api/competitionApi";
 import { CreateCompetitionPayload } from "@/lib/features/competition/types";
+import { BasicInfoStep } from "@/components/competitions/create/BasicInfoStep";
+import { SkillsStep } from "@/components/competitions/create/SkillsStep";
+import { TimelineRewardsStep } from "@/components/competitions/create/TimelineRewardsStep";
+import { QuizSettingsStep } from "@/components/competitions/create/QuizSettingsStep";
+import { TermsSubmissionStep } from "@/components/competitions/create/TermsSubmissionStep";
+import { CompetitionFormData } from "@/components/competitions/create/types";
 
 function CreateCompetitionPageContent() {
   const router = useRouter();
   const [createCompetition, { isLoading }] = useCreateCompetitionMutation();
   const [currentStep, setCurrentStep] = useState(1);
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<CompetitionFormData>({
     title: "",
     description: "",
     category: "",
-    skillsTested: [] as string[],
+    skillsTested: [],
     location: "",
     workType: "",
     experienceLevel: "",
@@ -60,12 +35,12 @@ function CreateCompetitionPageContent() {
     registrationFee: "free",
     maxParticipants: "",
     projectBrief: "",
-    evaluationCriteria: [] as string[],
-    termsAndConditions: [] as string[],
-    submissionFormats: [] as string[],
-    attachments: [] as File[],
-    fileLinks: [] as { name: string; url: string }[],
-    bannerImage: null as File | null,
+    evaluationCriteria: [],
+    termsAndConditions: [],
+    submissionFormats: [],
+    attachments: [],
+    fileLinks: [],
+    bannerImage: null,
     quizSettings: {
       passingScore: 0,
       timeLimit: 0,
@@ -73,14 +48,6 @@ function CreateCompetitionPageContent() {
       showResults: false,
     },
   });
-
-  const [newSkill, setNewSkill] = useState("");
-  const [newCriteria, setNewCriteria] = useState("");
-  const [newTerm, setNewTerm] = useState("");
-  const [newFormat, setNewFormat] = useState("");
-  const [newFileLink, setNewFileLink] = useState("");
-  const [newFileName, setNewFileName] = useState("");
-  const [dragActive, setDragActive] = useState(false);
 
   const totalSteps = 5;
 
@@ -122,16 +89,12 @@ function CreateCompetitionPageContent() {
     );
   };
 
-  const handleAddFileLink = () => {
-    if (newFileLink.trim() && newFileName.trim()) {
-      const newLink = { name: newFileName.trim(), url: newFileLink.trim() };
-      setFormData((prev) => ({
-        ...prev,
-        fileLinks: [...prev.fileLinks, newLink],
-      }));
-      setNewFileLink("");
-      setNewFileName("");
-    }
+  const handleAddFileLink = (name: string, url: string) => {
+    const newLink = { name: name.trim(), url: url.trim() };
+    setFormData((prev) => ({
+      ...prev,
+      fileLinks: [...prev.fileLinks, newLink],
+    }));
   };
 
   const removeFileLink = (index: number) => {
@@ -166,26 +129,6 @@ function CreateCompetitionPageContent() {
         ...prev,
         attachments: prev.attachments.filter((_, i) => i !== index),
       }));
-    }
-  };
-
-  const handleDrag = (e: React.DragEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    if (e.type === "dragenter" || e.type === "dragover") {
-      setDragActive(true);
-    } else if (e.type === "dragleave") {
-      setDragActive(false);
-    }
-  };
-
-  const handleDrop = (e: React.DragEvent, type: "banner" | "attachments") => {
-    e.preventDefault();
-    e.stopPropagation();
-    setDragActive(false);
-
-    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-      handleFileUpload(e.dataTransfer.files, type);
     }
   };
 
@@ -261,813 +204,46 @@ function CreateCompetitionPageContent() {
     switch (currentStep) {
       case 1:
         return (
-          <div className="space-y-10">
-            <div className="text-center">
-              <h2 className="text-2xl font-bold text-gray-900 mb-2">
-                Basic Information
-              </h2>
-              <p className="text-gray-600">
-                Tell us about your competition and upload a banner image
-              </p>
-            </div>
-
-            {/* Banner Image Upload */}
-            <div className="space-y-6">
-              <Label className="text-xl font-semibold">
-                Competition Banner Image
-              </Label>
-              <div
-                className={`relative border-2 border-dashed rounded-xl p-12 text-center transition-all duration-200 ${
-                  dragActive
-                    ? "border-orange-500 bg-orange-50"
-                    : formData.bannerImage
-                    ? "border-green-500 bg-green-50"
-                    : "border-gray-300 hover:border-orange-400 hover:bg-orange-50"
-                }`}
-                onDragEnter={handleDrag}
-                onDragLeave={handleDrag}
-                onDragOver={handleDrag}
-                onDrop={(e) => handleDrop(e, "banner")}
-              >
-                {formData.bannerImage ? (
-                  <div className="space-y-6">
-                    <div className="flex items-center justify-center space-x-3">
-                      <Image className="h-10 w-10 text-green-600" />
-                      <span className="text-xl font-medium text-green-700">
-                        {formData.bannerImage.name}
-                      </span>
-                    </div>
-                    <p className="text-base text-gray-600">
-                      Size:{" "}
-                      {(formData.bannerImage.size / 1024 / 1024).toFixed(2)} MB
-                    </p>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="lg"
-                      onClick={() => removeFile(0, "banner")}
-                      className="text-red-600 hover:text-red-700 hover:border-red-300 px-8 py-3"
-                    >
-                      <Trash2 className="h-5 w-5 mr-2" />
-                      Remove Image
-                    </Button>
-                  </div>
-                ) : (
-                  <div className="space-y-6">
-                    <Upload className="h-16 w-16 text-gray-400 mx-auto" />
-                    <div>
-                      <p className="text-xl font-medium text-gray-700 mb-3">
-                        Drop your banner image here, or click to browse
-                      </p>
-                      <p className="text-base text-gray-500">
-                        Recommended: 1200x400px, JPG or PNG, max 5MB
-                      </p>
-                    </div>
-                    <input
-                      type="file"
-                      accept="image/*"
-                      onChange={(e) =>
-                        handleFileUpload(e.target.files, "banner")
-                      }
-                      className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                    />
-                  </div>
-                )}
-              </div>
-            </div>
-
-            <div className="space-y-8">
-              <div className="grid grid-cols-1 gap-8">
-                <div className="space-y-2">
-                  <Label htmlFor="title" className="text-sm font-medium">
-                    Competition Title *
-                  </Label>
-                  <Input
-                    id="title"
-                    value={formData.title}
-                    onChange={(e) => handleInputChange("title", e.target.value)}
-                    placeholder="e.g., Senior Frontend Developer Challenge"
-                    className="h-10"
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="description" className="text-sm font-medium">
-                    Description *
-                  </Label>
-                  <Textarea
-                    id="description"
-                    value={formData.description}
-                    onChange={(e) =>
-                      handleInputChange("description", e.target.value)
-                    }
-                    placeholder="Describe what you're looking for and what the competition involves..."
-                    rows={4}
-                    className="resize-none"
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <div className="space-y-2">
-                  <Label htmlFor="category" className="text-sm font-medium">
-                    Category *
-                  </Label>
-                  <Select
-                    value={formData.category}
-                    onValueChange={(value) =>
-                      handleInputChange("category", value)
-                    }
-                  >
-                    <SelectTrigger className="h-10">
-                      <SelectValue placeholder="Select category" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {categories.map((category) => (
-                        <SelectItem key={category} value={category}>
-                          {category}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div className="space-y-2">
-                  <Label
-                    htmlFor="experienceLevel"
-                    className="text-sm font-medium"
-                  >
-                    Experience Level
-                  </Label>
-                  <Select
-                    value={formData.experienceLevel}
-                    onValueChange={(value) =>
-                      handleInputChange("experienceLevel", value)
-                    }
-                  >
-                    <SelectTrigger className="h-10">
-                      <SelectValue placeholder="Select experience level" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="entry">
-                        Entry Level (0-2 years)
-                      </SelectItem>
-                      <SelectItem value="mid">Mid Level (2-5 years)</SelectItem>
-                      <SelectItem value="senior">
-                        Senior Level (5-8 years)
-                      </SelectItem>
-                      <SelectItem value="lead">
-                        Lead/Principal (8+ years)
-                      </SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <div className="space-y-2">
-                  <Label htmlFor="location" className="text-sm font-medium">
-                    Location
-                  </Label>
-                  <Input
-                    id="location"
-                    value={formData.location}
-                    onChange={(e) =>
-                      handleInputChange("location", e.target.value)
-                    }
-                    placeholder="e.g., Remote, New York, NY"
-                    className="h-10"
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="workType" className="text-sm font-medium">
-                    Work Type
-                  </Label>
-                  <Select
-                    value={formData.workType}
-                    onValueChange={(value) =>
-                      handleInputChange("workType", value)
-                    }
-                  >
-                    <SelectTrigger className="h-10">
-                      <SelectValue placeholder="Select work type" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="remote">Remote</SelectItem>
-                      <SelectItem value="hybrid">Hybrid</SelectItem>
-                      <SelectItem value="onsite">On-site</SelectItem>
-                      <SelectItem value="flexible">Flexible</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-            </div>
-          </div>
+          <BasicInfoStep
+            formData={formData}
+            handleInputChange={handleInputChange}
+            handleFileUpload={handleFileUpload}
+            removeFile={removeFile}
+          />
         );
-
       case 2:
         return (
-          <div className="space-y-10">
-            <div className="text-center">
-              <h2 className="text-2xl font-bold text-gray-900 mb-2">
-                Skills & Requirements
-              </h2>
-              <p className="text-gray-600">
-                Define what skills you're looking for and project details
-              </p>
-            </div>
-
-            <div className="space-y-8">
-              <div className="space-y-4">
-                <Label className="text-sm font-medium">Skills Tested *</Label>
-                <div className="flex space-x-2">
-                  <Input
-                    value={newSkill}
-                    onChange={(e) => setNewSkill(e.target.value)}
-                    placeholder="Add a skill (e.g., React, Python, UI/UX)"
-                    onKeyPress={(e) =>
-                      e.key === "Enter" &&
-                      addToArray("skillsTested", newSkill, setNewSkill)
-                    }
-                    className="h-10"
-                  />
-                  <Button
-                    type="button"
-                    onClick={() =>
-                      addToArray("skillsTested", newSkill, setNewSkill)
-                    }
-                    size="default"
-                    className="px-4 h-10"
-                  >
-                    <Plus className="h-4 w-4" />
-                  </Button>
-                </div>
-
-                {formData.category &&
-                  skillSuggestions[
-                    formData.category as keyof typeof skillSuggestions
-                  ] && (
-                    <div className="space-y-4">
-                      <p className="text-base text-gray-600 font-medium">
-                        Suggested skills for {formData.category}:
-                      </p>
-                      <div className="flex flex-wrap gap-3">
-                        {skillSuggestions[
-                          formData.category as keyof typeof skillSuggestions
-                        ].map((skill) => (
-                          <Button
-                            key={skill}
-                            type="button"
-                            variant="outline"
-                            size="sm"
-                            onClick={() => {
-                              if (!formData.skillsTested.includes(skill)) {
-                                handleInputChange("skillsTested", [
-                                  ...formData.skillsTested,
-                                  skill,
-                                ]);
-                              }
-                            }}
-                            disabled={formData.skillsTested.includes(skill)}
-                            className="px-3 py-2"
-                          >
-                            {skill}
-                          </Button>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-                  {formData.skillsTested.map((skill, index) => (
-                    <div
-                      key={index}
-                      className="flex items-center justify-between bg-blue-50 p-4 rounded-lg border border-blue-200"
-                    >
-                      <span className="text-base font-medium">{skill}</span>
-                      <button
-                        type="button"
-                        onClick={() => removeFromArray("skillsTested", index)}
-                        className="text-red-500 hover:text-red-700 p-1 ml-2"
-                      >
-                        <X className="h-5 w-5" />
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="projectBrief" className="text-sm font-medium">
-                  Project Brief
-                </Label>
-                <Textarea
-                  id="projectBrief"
-                  value={formData.projectBrief}
-                  onChange={(e) =>
-                    handleInputChange("projectBrief", e.target.value)
-                  }
-                  placeholder="Describe the project or challenge participants will work on..."
-                  rows={4}
-                  className="resize-none"
-                />
-              </div>
-
-              <div className="space-y-4">
-                <Label className="text-sm font-medium">
-                  Evaluation Criteria
-                </Label>
-                <div className="flex space-x-2">
-                  <Input
-                    value={newCriteria}
-                    onChange={(e) => setNewCriteria(e.target.value)}
-                    placeholder="Add evaluation criteria (e.g., Code Quality, Innovation, User Experience)"
-                    onKeyPress={(e) =>
-                      e.key === "Enter" &&
-                      addToArray(
-                        "evaluationCriteria",
-                        newCriteria,
-                        setNewCriteria
-                      )
-                    }
-                    className="h-10"
-                  />
-                  <Button
-                    type="button"
-                    onClick={() =>
-                      addToArray(
-                        "evaluationCriteria",
-                        newCriteria,
-                        setNewCriteria
-                      )
-                    }
-                    size="default"
-                    className="px-4 h-10"
-                  >
-                    <Plus className="h-4 w-4" />
-                  </Button>
-                </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                  {formData.evaluationCriteria.map((criteria, index) => (
-                    <div
-                      key={index}
-                      className="flex items-center justify-between bg-green-50 p-4 rounded-lg border border-green-200"
-                    >
-                      <span className="text-base font-medium">{criteria}</span>
-                      <button
-                        type="button"
-                        onClick={() =>
-                          removeFromArray("evaluationCriteria", index)
-                        }
-                        className="text-red-500 hover:text-red-700 p-1 ml-2"
-                      >
-                        <X className="h-5 w-5" />
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </div>
+          <SkillsStep
+            formData={formData}
+            handleInputChange={handleInputChange}
+            addToArray={addToArray}
+            removeFromArray={removeFromArray}
+          />
         );
-
       case 3:
         return (
-          <div className="space-y-10">
-            <div className="text-center">
-              <h2 className="text-2xl font-bold text-gray-900 mb-2">
-                Timeline & Rewards
-              </h2>
-              <p className="text-gray-600">
-                Set dates and prizes for your competition
-              </p>
-            </div>
-
-            <div className="space-y-8">
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                <div className="space-y-2">
-                  <Label htmlFor="startDate" className="text-sm font-medium">
-                    Start Date *
-                  </Label>
-                  <Input
-                    id="startDate"
-                    type="date"
-                    value={formData.startDate}
-                    onChange={(e) =>
-                      handleInputChange("startDate", e.target.value)
-                    }
-                    className="h-10"
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="endDate" className="text-sm font-medium">
-                    End Date *
-                  </Label>
-                  <Input
-                    id="endDate"
-                    type="date"
-                    value={formData.endDate}
-                    onChange={(e) =>
-                      handleInputChange("endDate", e.target.value)
-                    }
-                    className="h-10"
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="resultDate" className="text-sm font-medium">
-                    Result Date
-                  </Label>
-                  <Input
-                    id="resultDate"
-                    type="date"
-                    value={formData.resultDate}
-                    onChange={(e) =>
-                      handleInputChange("resultDate", e.target.value)
-                    }
-                    className="h-10"
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                <div className="space-y-2">
-                  <Label htmlFor="prize" className="text-sm font-medium">
-                    Prize *
-                  </Label>
-                  <Input
-                    id="prize"
-                    value={formData.prize}
-                    onChange={(e) => handleInputChange("prize", e.target.value)}
-                    placeholder="e.g., $5,000 + Job Offer"
-                    className="h-10"
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label
-                    htmlFor="maxParticipants"
-                    className="text-sm font-medium"
-                  >
-                    Max Participants
-                  </Label>
-                  <Input
-                    id="maxParticipants"
-                    type="number"
-                    value={formData.maxParticipants}
-                    onChange={(e) =>
-                      handleInputChange("maxParticipants", e.target.value)
-                    }
-                    placeholder="Leave empty for unlimited"
-                    className="h-10"
-                  />
-                </div>
-              </div>
-
-              <div className="space-y-4">
-                <Label className="text-sm font-medium">Registration Fee</Label>
-                <div className="flex space-x-8">
-                  <div className="flex items-center space-x-3">
-                    <Checkbox
-                      id="free"
-                      checked={formData.registrationFee === "free"}
-                      onCheckedChange={() =>
-                        handleInputChange("registrationFee", "free")
-                      }
-                    />
-                    <Label htmlFor="free" className="text-base font-medium">
-                      Free
-                    </Label>
-                  </div>
-                  <div className="flex items-center space-x-3">
-                    <Checkbox
-                      id="paid"
-                      checked={formData.registrationFee === "paid"}
-                      onCheckedChange={() =>
-                        handleInputChange("registrationFee", "paid")
-                      }
-                    />
-                    <Label htmlFor="paid" className="text-base font-medium">
-                      Paid
-                    </Label>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
+          <TimelineRewardsStep
+            formData={formData}
+            handleInputChange={handleInputChange}
+          />
         );
       case 4:
         return (
-          <div className="space-y-10">
-            <div className="text-center">
-              <h2 className="text-2xl font-bold text-gray-900 mb-2">
-                Quiz Settings
-              </h2>
-              <p className="text-gray-600">
-                Configure the settings for the quiz part of your competition.
-              </p>
-            </div>
-
-            <div className="space-y-8">
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                <div className="space-y-2">
-                  <Label htmlFor="passingScore" className="text-sm font-medium">
-                    Passing Score (%)
-                  </Label>
-                  <Input
-                    id="passingScore"
-                    type="number"
-                    value={formData.quizSettings.passingScore}
-                    onChange={(e) =>
-                      handleInputChange(
-                        "quizSettings.passingScore",
-                        e.target.value
-                      )
-                    }
-                    placeholder="e.g., 75"
-                    className="h-10"
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="timeLimit" className="text-sm font-medium">
-                    Time Limit (minutes)
-                  </Label>
-                  <Input
-                    id="timeLimit"
-                    type="number"
-                    value={formData.quizSettings.timeLimit}
-                    onChange={(e) =>
-                      handleInputChange(
-                        "quizSettings.timeLimit",
-                        e.target.value
-                      )
-                    }
-                    placeholder="e.g., 60"
-                    className="h-10"
-                  />
-                </div>
-              </div>
-
-              <div className="space-y-4">
-                <div className="flex items-center space-x-3">
-                  <Checkbox
-                    id="randomizeQuestions"
-                    checked={formData.quizSettings.randomizeQuestions}
-                    onCheckedChange={(checked) =>
-                      handleInputChange(
-                        "quizSettings.randomizeQuestions",
-                        !!checked
-                      )
-                    }
-                  />
-                  <Label
-                    htmlFor="randomizeQuestions"
-                    className="text-base font-medium"
-                  >
-                    Randomize Questions
-                  </Label>
-                </div>
-                <div className="flex items-center space-x-3">
-                  <Checkbox
-                    id="showResults"
-                    checked={formData.quizSettings.showResults}
-                    onCheckedChange={(checked) =>
-                      handleInputChange("quizSettings.showResults", !!checked)
-                    }
-                  />
-                  <Label
-                    htmlFor="showResults"
-                    className="text-base font-medium"
-                  >
-                    Show Results to Participants Immediately
-                  </Label>
-                </div>
-              </div>
-            </div>
-          </div>
+          <QuizSettingsStep
+            formData={formData}
+            handleInputChange={handleInputChange}
+          />
         );
       case 5:
         return (
-          <div className="space-y-10">
-            <div className="text-center">
-              <h2 className="text-2xl font-bold text-gray-900 mb-2">
-                Terms & Submission
-              </h2>
-              <p className="text-gray-600">
-                Final details, terms, and additional files
-              </p>
-            </div>
-
-            <div className="space-y-8">
-              <div className="space-y-4">
-                <Label className="text-sm font-medium">
-                  Submission Formats
-                </Label>
-                <div className="flex space-x-2">
-                  <Input
-                    value={newFormat}
-                    onChange={(e) => setNewFormat(e.target.value)}
-                    placeholder="e.g., GitHub repository, PDF document, Video URL"
-                    onKeyPress={(e) =>
-                      e.key === "Enter" &&
-                      addToArray("submissionFormats", newFormat, setNewFormat)
-                    }
-                    className="h-10"
-                  />
-                  <Button
-                    type="button"
-                    onClick={() =>
-                      addToArray("submissionFormats", newFormat, setNewFormat)
-                    }
-                    size="default"
-                    className="px-4 h-10"
-                  >
-                    <Plus className="h-4 w-4" />
-                  </Button>
-                </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-                  {formData.submissionFormats.map((format, index) => (
-                    <div
-                      key={index}
-                      className="flex items-center justify-between bg-gray-50 p-4 rounded-lg border"
-                    >
-                      <span className="text-sm font-medium">{format}</span>
-                      <button
-                        type="button"
-                        onClick={() =>
-                          removeFromArray("submissionFormats", index)
-                        }
-                        className="text-red-500 hover:text-red-700 p-1 ml-2"
-                      >
-                        <X className="h-5 w-5" />
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Additional Files & Documents Links */}
-              <div className="space-y-4">
-                <Label className="text-sm font-medium">
-                  Additional Files & Documents
-                </Label>
-                <p className="text-sm text-gray-600 mb-3">
-                  Add links to additional files like project requirements,
-                  templates, or reference materials (Google Drive, Dropbox,
-                  etc.).
-                </p>
-                <div className="space-y-3">
-                  <div className="flex space-x-2">
-                    <Input
-                      placeholder="Enter file link (e.g., Google Drive, Dropbox)"
-                      value={newFileLink}
-                      onChange={(e) => setNewFileLink(e.target.value)}
-                      className="flex-1"
-                    />
-                    <Input
-                      placeholder="File name/description"
-                      value={newFileName}
-                      onChange={(e) => setNewFileName(e.target.value)}
-                      className="w-48"
-                    />
-                    <Button
-                      type="button"
-                      onClick={handleAddFileLink}
-                      disabled={!newFileLink.trim() || !newFileName.trim()}
-                      className="bg-orange-600 hover:bg-orange-700 text-white px-4"
-                    >
-                      <Plus className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </div>
-
-                {/* Display added file links */}
-                {formData.fileLinks && formData.fileLinks.length > 0 && (
-                  <div className="space-y-3">
-                    <p className="text-sm font-medium text-gray-700">
-                      Added Files:
-                    </p>
-                    <div className="space-y-2">
-                      {formData.fileLinks.map((fileLink, index) => (
-                        <div
-                          key={index}
-                          className="flex items-center justify-between bg-blue-50 p-3 rounded-lg border border-blue-200"
-                        >
-                          <div className="flex items-center space-x-3">
-                            <File className="h-4 w-4 text-blue-600" />
-                            <div>
-                              <p className="text-sm font-medium text-blue-900">
-                                {fileLink.name}
-                              </p>
-                              <a
-                                href={fileLink.url}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="text-xs text-blue-600 hover:underline"
-                              >
-                                {fileLink.url}
-                              </a>
-                            </div>
-                          </div>
-                          <Button
-                            type="button"
-                            variant="outline"
-                            size="sm"
-                            onClick={() => removeFileLink(index)}
-                            className="text-red-600 hover:text-red-700 hover:border-red-300"
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              <div className="space-y-4">
-                <Label className="text-sm font-medium">
-                  Terms and Conditions
-                </Label>
-                <div className="flex space-x-2">
-                  <Input
-                    value={newTerm}
-                    onChange={(e) => setNewTerm(e.target.value)}
-                    placeholder="Add a term or condition"
-                    onKeyPress={(e) =>
-                      e.key === "Enter" &&
-                      addToArray("termsAndConditions", newTerm, setNewTerm)
-                    }
-                    className="h-10"
-                  />
-                  <Button
-                    type="button"
-                    onClick={() =>
-                      addToArray("termsAndConditions", newTerm, setNewTerm)
-                    }
-                    size="default"
-                    className="px-4 h-10"
-                  >
-                    <Plus className="h-4 w-4" />
-                  </Button>
-                </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                  {formData.termsAndConditions.map((term, index) => (
-                    <div
-                      key={index}
-                      className="flex items-center justify-between bg-gray-50 p-4 rounded-lg border"
-                    >
-                      <span className="text-sm font-medium">{term}</span>
-                      <button
-                        type="button"
-                        onClick={() =>
-                          removeFromArray("termsAndConditions", index)
-                        }
-                        className="text-red-500 hover:text-red-700 p-1 ml-2"
-                      >
-                        <X className="h-5 w-5" />
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Preview */}
-              <Card className="bg-blue-50 border-blue-200">
-                <CardHeader>
-                  <CardTitle className="text-lg text-blue-900">
-                    Competition Preview
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-2 text-sm">
-                  <p>
-                    <strong>Title:</strong> {formData.title || "Not set"}
-                  </p>
-                  <p>
-                    <strong>Category:</strong> {formData.category || "Not set"}
-                  </p>
-                  <p>
-                    <strong>Skills:</strong>{" "}
-                    {formData.skillsTested.join(", ") || "None added"}
-                  </p>
-                  <p>
-                    <strong>Prize:</strong> {formData.prize || "Not set"}
-                  </p>
-                  <p>
-                    <strong>Duration:</strong>{" "}
-                    {formData.startDate && formData.endDate
-                      ? `${formData.startDate} to ${formData.endDate}`
-                      : "Not set"}
-                  </p>
-                </CardContent>
-              </Card>
-            </div>
-          </div>
+          <TermsSubmissionStep
+            formData={formData}
+            addToArray={addToArray}
+            removeFromArray={removeFromArray}
+            handleAddFileLink={handleAddFileLink}
+            removeFileLink={removeFileLink}
+          />
         );
-
       default:
         return null;
     }

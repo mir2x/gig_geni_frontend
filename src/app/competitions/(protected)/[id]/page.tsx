@@ -2,49 +2,21 @@
 import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import Image from "next/image";
-import {
-  ArrowLeft,
-  MapPin,
-  Calendar,
-  Users,
-  Trophy,
-  Star,
-  Clock,
-  FileText,
-  CheckCircle,
-  Share2,
-  Download,
-  AlertCircle,
-  Target,
-  Award,
-  Building,
-  Bookmark,
-  File,
-  BookMarked,
-  Loader2,
-  DollarSign,
-  Link as LinkIcon,
-  MessageSquare,
-} from "lucide-react";
+import { AlertCircle, FileText, Loader2 } from "lucide-react";
 import { toast } from "sonner";
-
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
 
 import { selectCurrentUser } from "@/lib/features/auth/authSlice";
 import { useGetCompetitionQuery } from "@/lib/api/competitionApi";
 import { useAppSelector } from "@/lib/hooks";
 import { Competition } from "@/lib/features/competition/types";
 import { useCheckParticipantMutation } from "@/lib/api/participantApi";
-import { User } from "@/lib/features/user/types";
+
+import { DetailsHeader } from "@/components/competitions/details/DetailsHeader";
+import { HeroSection } from "@/components/competitions/details/HeroSection";
+import { OverviewCard } from "@/components/competitions/details/OverviewCard";
+import { ResourcesCard } from "@/components/competitions/details/ResourcesCard";
+import { DetailedTabs } from "@/components/competitions/details/DetailedTabs";
+import { Sidebar } from "@/components/competitions/details/Sidebar";
 
 export default function CompetitionDetailsPage() {
   const params = useParams();
@@ -62,8 +34,7 @@ export default function CompetitionDetailsPage() {
     "checking" | "joined" | "not_joined" | "error"
   >("checking");
 
-  const [checkParticipant, { isLoading: isCheckLoading }] =
-    useCheckParticipantMutation();
+  const [checkParticipant] = useCheckParticipantMutation();
 
   useEffect(() => {
     if (competition && currentUser && competitionId) {
@@ -92,21 +63,7 @@ export default function CompetitionDetailsPage() {
   }, [competition, currentUser, competitionId, checkParticipant]);
 
   const [isSaved, setIsSaved] = useState(false);
-  const [isNativeShareSupported, setIsNativeShareSupported] = useState(false);
-  const [isShareOpen, setIsShareOpen] = useState(false);
 
-  useEffect(() => {
-    if (
-      typeof navigator !== "undefined" &&
-      typeof navigator.canShare === "function"
-    ) {
-      if (navigator.canShare({ url: window.location.href })) {
-        setIsNativeShareSupported(true);
-      }
-    }
-  }, []);
-
-  // --- (Helper functions remain the same) ---
   const formatDate = (dateString: string | undefined) => {
     if (!dateString) return "TBD";
     return new Date(dateString).toLocaleDateString("en-US", {
@@ -144,37 +101,6 @@ export default function CompetitionDetailsPage() {
     toast.success(!isSaved ? "Competition saved!" : "Competition unsaved.");
   };
 
-  // --- STEP 2: Update the copy handler to show toast and close the popover ---
-  const handleCopyToClipboard = () => {
-    navigator.clipboard
-      .writeText(window.location.href)
-      .then(() => {
-        toast.success("Link copied to clipboard!");
-        setIsShareOpen(false);
-      })
-      .catch((err) => {
-        console.error("Failed to copy link: ", err);
-        toast.error("Could not copy link.");
-        setIsShareOpen(false);
-      });
-  };
-
-  const handleNativeShare = () => {
-    if (navigator.share) {
-      navigator
-        .share({
-          title: competition?.title,
-          text: `Check out this competition: ${competition?.title}`,
-          url: window.location.href,
-        })
-        .catch((error) => console.log("Error sharing:", error))
-
-        .finally(() => setIsShareOpen(false));
-    } else {
-      toast.error("Web sharing is not supported on this browser.");
-    }
-  };
-
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -204,14 +130,12 @@ export default function CompetitionDetailsPage() {
   }
 
   const skillsString = competition.skillsTested;
-
   const skillsArray = skillsString
     .split(",")
     .map((skill) => skill.trim())
     .filter((skill) => skill.length > 0);
 
   const criteriaString = competition.evaluationCriteria;
-
   const criteriaArray = criteriaString
     .split(",")
     .map((criterion) => criterion.trim())
@@ -221,237 +145,22 @@ export default function CompetitionDetailsPage() {
   const projectBriefHtml = { __html: decodedHtml };
 
   const status = getStatusBadge(competition);
-  const shareUrl = typeof window !== "undefined" ? window.location.href : "";
-  const shareText = `Check out this competition: ${competition.title}\n${shareUrl}`;
-
-  const getJoinButtonContent = () => {
-    switch (participationStatus) {
-      case "checking":
-        return (
-          <>
-            <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-            Checking Status...
-          </>
-        );
-      case "joined":
-        return (
-          <>
-            <CheckCircle className="h-4 w-4 mr-2" />
-            Already Joined
-          </>
-        );
-      case "not_joined":
-        return (
-          <>
-            <Trophy className="h-4 w-4 mr-2" />
-            Join Competition
-          </>
-        );
-      case "error":
-        return (
-          <>
-            <AlertCircle className="h-4 w-4 mr-2" />
-            Cannot Join
-          </>
-        );
-      default:
-        return "Join Competition";
-    }
-  };
 
   return (
     <div className="min-h-screen container">
-      <div className="relative z-20 bg-transparent mt-5">
-        <div className="absolute top-0 left-0 right-0 p-6">
-          <div className="flex items-center justify-between">
-            <Button
-              variant="outline"
-              size="sm"
-              className="bg-white/90 backdrop-blur-sm text-gray-800 hover:bg-white border border-gray-300 shadow-md"
-              onClick={() => router.back()}
-            >
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              Back
-            </Button>
+      <DetailsHeader
+        competition={competition}
+        isSaved={isSaved}
+        onSave={handleSave}
+      />
 
-            <div className="flex items-center space-x-3">
-              <Popover open={isShareOpen} onOpenChange={setIsShareOpen}>
-                <PopoverTrigger asChild>
-                  <Button
-                    variant="outline"
-                    className="bg-white/90 backdrop-blur-sm hover:bg-white shadow-sm"
-                  >
-                    <Share2 className="h-4 w-4 mr-2" />
-                    Share
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-56 p-2" align="end">
-                  <div className="flex flex-col space-y-1">
-                    {isNativeShareSupported && (
-                      <Button
-                        variant="ghost"
-                        className="w-full justify-start"
-                        onClick={handleNativeShare}
-                      >
-                        <Share2 className="h-4 w-4 mr-2" />
-                        Share via...
-                      </Button>
-                    )}
-                    <Button
-                      asChild
-                      variant="ghost"
-                      className="w-full justify-start"
-                    >
-                      <a
-                        href={`https://wa.me/?text=${encodeURIComponent(
-                          shareText
-                        )}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        onClick={() => setIsShareOpen(false)} // Also close for social links
-                      >
-                        <MessageSquare className="h-4 w-4 mr-2" />
-                        Share on WhatsApp
-                      </a>
-                    </Button>
-                    <Button
-                      asChild
-                      variant="ghost"
-                      className="w-full justify-start"
-                    >
-                      <a
-                        href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(
-                          shareUrl
-                        )}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        onClick={() => setIsShareOpen(false)} // Also close for social links
-                      >
-                        <MessageSquare className="h-4 w-4 mr-2" />
-                        Share on Messenger
-                      </a>
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      className="w-full justify-start"
-                      onClick={handleCopyToClipboard}
-                    >
-                      <LinkIcon className="h-4 w-4 mr-2" />
-                      Copy Link
-                    </Button>
-                  </div>
-                </PopoverContent>
-              </Popover>
-
-              <Button
-                variant={isSaved ? "default" : "outline"}
-                onClick={handleSave}
-                className={
-                  isSaved
-                    ? "bg-orange-500 hover:bg-orange-600 shadow-sm"
-                    : "bg-white/90 backdrop-blur-sm hover:bg-white shadow-sm"
-                }
-              >
-                {isSaved ? (
-                  <BookMarked className="h-4 w-4 mr-2" />
-                ) : (
-                  <Bookmark className="h-4 w-4 mr-2" />
-                )}
-                {isSaved ? "Saved" : "Save"}
-              </Button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* --- (The rest of your page JSX remains the same) --- */}
-      <div className="relative h-64 md:h-80 w-full rounded-xl overflow-hidden">
-        <Image
-          src={competition.bannerImage}
-          alt={competition.title}
-          fill
-          className="object-cover"
-          priority
-          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-        />
-
-        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
-
-        <div className="absolute bottom-6 left-6 text-white z-10">
-          <div className="flex items-center space-x-2 mb-2">
-            <Badge className="bg-white text-gray-900">
-              {competition.category}
-            </Badge>
-            <Badge className={status.color}>{status.text}</Badge>
-          </div>
-          <h1 className="text-3xl md:text-4xl font-bold mb-2">
-            {competition.title}
-          </h1>
-          <p className="text-lg opacity-90">by {competition.createdBy.name}</p>
-        </div>
-      </div>
+      <HeroSection competition={competition} status={status} />
 
       <div className="w-full py-8">
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8  ">
           {/* Main Content */}
           <div className="lg:col-span-3 space-y-6">
-            {/* Competition Header */}
-            <Card>
-              <CardContent className="p-6">
-                <div className="flex items-start justify-between mb-4">
-                  <div className="flex-1">
-                    <div className="flex items-center space-x-3 mb-3">
-                      <Badge className={status.color}>{status.text}</Badge>
-
-                      <div className="flex items-center text-sm text-gray-600">
-                        <Star className="h-4 w-4 fill-yellow-400 text-yellow-400 mr-1" />
-                        4.8
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Categories */}
-                <div className="flex flex-wrap gap-2 mb-6">
-                  {competition.category}
-                </div>
-
-                {/* Key Info Grid */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-                  {competition.location && (
-                    <div className="flex items-center text-sm text-gray-600">
-                      <MapPin className="h-4 w-4 mr-2 text-gray-400" />
-                      <span>{competition.location}</span>
-                    </div>
-                  )}
-                  {/* <div className="flex items-center text-sm text-gray-600">
-                    <Users className="h-4 w-4 mr-2 text-gray-400" />
-                    <span>
-                      {competition.totalParticipants || 0} participants
-                    </span>
-                  </div> */}
-                  <div className="flex items-center text-sm text-gray-600">
-                    <DollarSign className="h-4 w-4 mr-2 text-gray-400" />
-                    <span>{competition.registrationFee}</span>
-                  </div>
-
-                  <div className="flex items-center text-sm font-semibold text-green-600">
-                    <Trophy className="h-4 w-4 mr-2" />
-                    <span>{competition.prize}</span>
-                  </div>
-                </div>
-
-                {/* Description */}
-                <div>
-                  <h3 className="text-lg font-semibold text-gray-900 mb-3">
-                    About This Competition
-                  </h3>
-                  <p className="text-gray-700 leading-relaxed">
-                    {competition.description}
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
+            <OverviewCard competition={competition} status={status} />
 
             {/* Project Brief */}
             <Card>
@@ -462,408 +171,32 @@ export default function CompetitionDetailsPage() {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                {/* The decoded HTML content is injected here */}
                 <div
                   className="text-gray-700 leading-relaxed"
                   dangerouslySetInnerHTML={projectBriefHtml}
                 />
-                {/* Note: We replaced the <p> tag with a generic <div> 
-            and applied the styling, as the decoded HTML might contain block-level 
-            elements (like h2, h3, ul) that shouldn't be nested inside a <p> tag.
-        */}
               </CardContent>
             </Card>
 
-            {/* Resources & Downloads */}
-            {/* Check if the array exists AND has content before rendering the entire card */}
-            {competition.additionalFiles &&
-              competition.additionalFiles.length > 0 && (
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center space-x-2">
-                      <Download className="h-5 w-5" />
-                      <span>Resources</span>
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    {/* Map over the array to generate a resource block for each file */}
-                    {competition.additionalFiles.map((file, index) => (
-                      <div
-                        key={index} // Use a unique key for list items
-                        className="p-4 bg-gray-50 rounded-lg border hover:bg-gray-100 transition-colors mb-3 last:mb-0"
-                        // Added mb-3 to separate multiple file blocks
-                      >
-                        <div className="flex items-start space-x-3">
-                          {/* Assuming the 'File' icon is standard, but you might want to use a dynamic icon based on file type */}
-                          <File className="h-5 w-5 text-blue-600 mt-0.5 flex-shrink-0" />
-                          <div className="flex-1">
-                            <a
-                              href={file.link} // Use the file's dynamic URL
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="font-medium text-blue-600 hover:text-blue-800 hover:underline"
-                            >
-                              {/* Use the file's dynamic title/name */}
-                              {file.description || "Download Resource"}
-                            </a>
-                            <p className="text-sm text-gray-600 mt-1">
-                              {/* Use the file's dynamic description */}
-                              {file.description || "No description provided."}
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </CardContent>
-                </Card>
-              )}
+            <ResourcesCard competition={competition} />
 
-            {/* Detailed Information Tabs */}
-            <Card>
-              <CardContent className="p-6">
-                <Tabs defaultValue="details" className="w-full">
-                  <TabsList className="grid w-full grid-cols-4">
-                    <TabsTrigger value="details">Details</TabsTrigger>
-                    <TabsTrigger value="skills">Skills</TabsTrigger>
-                    <TabsTrigger value="timeline">Timeline</TabsTrigger>
-                    <TabsTrigger value="terms">Terms</TabsTrigger>
-                  </TabsList>
-
-                  <TabsContent value="details" className="mt-6">
-                    <div className="space-y-6">
-                      {competition.submissionFormats &&
-                        competition.submissionFormats.length > 0 && (
-                          <div>
-                            <h4 className="text-lg font-semibold text-gray-900 mb-3 flex items-center">
-                              <Download className="h-5 w-5 mr-2 text-orange-500" />
-                              Submission Formats
-                            </h4>
-                            <div className="flex flex-wrap gap-2">
-                              {competition.submissionFormats.map(
-                                (format, index) => (
-                                  <Badge
-                                    key={index}
-                                    variant="outline"
-                                    className="text-sm"
-                                  >
-                                    {format}
-                                  </Badge>
-                                )
-                              )}
-                            </div>
-                          </div>
-                        )}
-
-                      {/* <div>
-                        <h4 className="text-lg font-semibold text-gray-900 mb-3">
-                          Maximum File Size
-                        </h4>
-                        <p className="text-gray-700">10 MB</p>
-                      </div> */}
-
-                      {/* Evaluation Criteria */}
-                      <div className="mt-6">
-                        {" "}
-                        {/* Assuming this section is not in a TabsContent like the last one, I'm adding a margin top for separation */}
-                        <h4 className="text-lg font-semibold text-gray-900 mb-3 flex items-center">
-                          <Award className="h-5 w-5 mr-2 text-orange-500" />
-                          Evaluation Criteria
-                        </h4>
-                        <div className="space-y-3">
-                          {/* Dynamic rendering starts here:
-            Iterate over the criteriaArray and generate a div for each one.
-        */}
-                          {criteriaArray.map((criterion, index) => (
-                            <div
-                              key={index}
-                              className="flex items-center space-x-3"
-                            >
-                              {/* Reusing the CheckCircle for a consistent "list item" look */}
-                              <CheckCircle className="h-4 w-4 text-orange-500 flex-shrink-0" />
-                              <span className="text-gray-800">
-                                {/* The individual criterion */}
-                                {criterion}
-                              </span>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-
-                      {/* Submission Requirements */}
-                      {/* <div>
-                        <h4 className="text-lg font-semibold text-gray-900 mb-3 flex items-center">
-                          <FileText className="h-5 w-5 mr-2 text-orange-500" />
-                          Submission Requirements
-                        </h4>
-                        <div className="space-y-3">
-                          {[
-                            "GitHub Repository Link",
-                            "Live Demo URL",
-                            "Project Documentation (PDF)",
-                            "Video Walkthrough (Optional)",
-                          ].map((format, index) => (
-                            <div
-                              key={index}
-                              className="flex items-center space-x-3"
-                            >
-                              <File className="h-4 w-4 text-blue-600" />
-                              <span className="text-gray-700">{format}</span>
-                            </div>
-                          ))}
-                        </div> */}
-                      {/* </div> */}
-                    </div>
-                  </TabsContent>
-
-                  <TabsContent value="skills" className="mt-6">
-                    <div>
-                      <h4 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-                        <Target className="h-5 w-5 mr-2 text-orange-500" />
-                        Skills Being Tested
-                      </h4>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                        {skillsArray.map((skill, index) => (
-                          <div key={index} className="flex items-center">
-                            <CheckCircle className="h-4 w-4 text-orange-500 mr-3" />
-                            <span className="text-gray-800 font-medium">
-                              {/* The individual, cleaned-up skill */}
-                              {skill}
-                            </span>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  </TabsContent>
-
-                  <TabsContent value="timeline" className="mt-6">
-                    <div className="space-y-6">
-                      <h4 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-                        <Calendar className="h-5 w-5 mr-2 text-orange-500" />
-                        Important Dates
-                      </h4>
-
-                      <div className="space-y-4">
-                        {competition.startDate && (
-                          <div className="flex items-center justify-between p-4 bg-blue-50 rounded-lg">
-                            <div className="flex items-center">
-                              <Clock className="h-5 w-5 text-blue-500 mr-3" />
-                              <div>
-                                <p className="font-semibold text-gray-900">
-                                  Competition Starts
-                                </p>
-                                <p className="text-sm text-gray-600">
-                                  Registration deadline
-                                </p>
-                              </div>
-                            </div>
-                            <p className="text-lg font-semibold text-blue-600">
-                              {formatDate(competition.startDate)}
-                            </p>
-                          </div>
-                        )}
-
-                        {competition.endDate && (
-                          <div className="flex items-center justify-between p-4 bg-orange-50 rounded-lg">
-                            <div className="flex items-center">
-                              <Clock className="h-5 w-5 text-orange-500 mr-3" />
-                              <div>
-                                <p className="font-semibold text-gray-900">
-                                  Submission Deadline
-                                </p>
-                                <p className="text-sm text-gray-600">
-                                  Final submissions due
-                                </p>
-                              </div>
-                            </div>
-                            <p className="text-lg font-semibold text-orange-600">
-                              {formatDate(competition.endDate)}
-                            </p>
-                          </div>
-                        )}
-
-                        {competition.resultDate && (
-                          <div className="flex items-center justify-between p-4 bg-green-50 rounded-lg">
-                            <div className="flex items-center">
-                              <Award className="h-5 w-5 text-green-500 mr-3" />
-                              <div>
-                                <p className="font-semibold text-gray-900">
-                                  Results Announced
-                                </p>
-                                <p className="text-sm text-gray-600">
-                                  Winners will be announced
-                                </p>
-                              </div>
-                            </div>
-                            <p className="text-lg font-semibold text-green-600">
-                              {formatDate(competition.resultDate)}
-                            </p>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  </TabsContent>
-
-                  <TabsContent value="terms" className="mt-6">
-                    <div>
-                      <h4 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-                        <FileText className="h-5 w-5 mr-2 text-orange-500" />
-                        Terms and Conditions
-                      </h4>
-                      {competition.termsAndConditions &&
-                      competition.termsAndConditions.length > 0 ? (
-                        <div className="space-y-3">
-                          {competition.termsAndConditions.map((term, index) => (
-                            <div
-                              key={index}
-                              className="flex items-start p-3 bg-gray-50 rounded-lg"
-                            >
-                              <span className="text-orange-500 font-semibold mr-3">
-                                {index + 1}.
-                              </span>
-                              <p className="text-gray-700">{term}</p>
-                            </div>
-                          ))}
-                        </div>
-                      ) : (
-                        <p className="text-gray-600 italic">
-                          Terms and conditions will be provided upon
-                          registration.
-                        </p>
-                      )}
-                    </div>
-                  </TabsContent>
-                </Tabs>
-              </CardContent>
-            </Card>
+            <DetailedTabs
+              competition={competition}
+              criteriaArray={criteriaArray}
+              skillsArray={skillsArray}
+              formatDate={formatDate}
+            />
           </div>
 
           {/* Sidebar */}
           <div className="lg:col-span-1">
-            <div className="space-y-6 sticky top-6">
-              {/* Join Competition */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-xl font-bold text-gray-900">
-                    Join Competition
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="text-center">
-                    <div className="text-3xl font-bold text-orange-600 mb-1">
-                      ৳{competition.prize}
-                    </div>
-                    <p className="text-sm text-gray-600">Total Prize Pool</p>
-                  </div>
-
-                  <Separator />
-
-                  <div className="space-y-3">
-                    {/* <div className="flex justify-between text-sm">
-                      <span className="text-gray-600">Participants:</span>
-                      <span className="font-medium">
-                        {competition.totalParticipants || 0}
-                      </span>
-                    </div>  */}
-                    <div className="flex justify-between text-sm">
-                      <span className="text-gray-600">Registration:</span>
-                      <span className="font-medium">
-                        {competition.registrationFee}
-                      </span>
-                    </div>
-                    <div className="flex justify-between text-sm">
-                      <span className="text-gray-600">Deadline:</span>
-                      <span className="font-medium text-orange-600">
-                        {formatShortDate(new Date(competition.endDate))}
-                      </span>
-                    </div>
-                  </div>
-
-                  <Separator />
-
-                  <div className="space-y-3">
-                    <Button
-                      onClick={handleJoin}
-                      className={`w-full ${
-                        participationStatus === "joined"
-                          ? "bg-green-500 hover:bg-green-600"
-                          : "bg-orange-600 hover:bg-orange-700"
-                      } text-white`}
-                      size="lg"
-                      disabled={
-                        status.text === "Completed" ||
-                        participationStatus === "checking" ||
-                        participationStatus === "joined" ||
-                        participationStatus === "error"
-                      }
-                    >
-                      {getJoinButtonContent()}
-                    </Button>
-
-                    {status.text === "Completed" && (
-                      <p className="text-sm text-gray-500 text-center">
-                        This competition has ended
-                      </p>
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Quick Info Card */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-lg font-semibold text-gray-900">
-                    Quick Info
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="flex items-center space-x-3">
-                    <Calendar className="h-5 w-5 text-blue-600" />
-                    <div>
-                      <p className="font-medium text-gray-900">Duration</p>
-                      <p className="text-sm text-gray-600">
-                        {formatShortDate(new Date(competition.startDate))} -{" "}
-                        {formatShortDate(new Date(competition.endDate))}
-                      </p>
-                    </div>
-                  </div>
-
-                  <Separator />
-
-                  <div className="flex items-center space-x-3">
-                    <Users className="h-5 w-5 text-green-600" />
-                    <div>
-                      <p className="font-medium text-gray-900">Announcement</p>
-                      <p className="text-sm text-gray-600">
-                        {formatShortDate(new Date(competition.resultDate!)) ||
-                          "Not Announced"}
-                      </p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Organizer Card */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-lg font-semibold text-gray-900">
-                    Organizer
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="flex items-center space-x-3">
-                    <div className="w-12 h-12 bg-gradient-to-r from-orange-500 to-orange-600 rounded-full flex items-center justify-center">
-                      <Building className="h-6 w-6 text-white" />
-                    </div>
-                    <div>
-                      <p className="font-semibold text-gray-900">
-                        {competition.createdBy.name}
-                      </p>
-                      <p className="text-sm text-gray-600">Competition Host</p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
+            <Sidebar
+              competition={competition}
+              participationStatus={participationStatus}
+              status={status}
+              formatShortDate={formatShortDate}
+              handleJoin={handleJoin}
+            />
           </div>
         </div>
       </div>
