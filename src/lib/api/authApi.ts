@@ -6,6 +6,12 @@ import {
   VerifyOtpPayload,
   RefreshTokenPayload,
   ApiResponse,
+  ForgotPasswordPayload,
+  ForgotPasswordResponse,
+  ResendOtpPayload,
+  ResendOtpResponse,
+  ResetPasswordPayload,
+  ResetPasswordResponse,
 } from "@/types";
 
 import { userLoggedIn } from "@/lib/features/auth/authSlice";
@@ -33,7 +39,11 @@ export const authApi = baseApi.injectEndpoints({
       async onQueryStarted(arg, { dispatch, queryFulfilled }) {
         try {
           const { data } = await queryFulfilled;
-          dispatch(userLoggedIn(data.data!));
+          // The backend returns user, accessToken, refreshToken on success for both Verify and Reset types.
+          // We can log the user in immediately.
+          if (data.success && data.data) {
+            dispatch(userLoggedIn(data.data));
+          }
         } catch (error) {
           console.error("OTP Verification failed:", error);
         }
@@ -64,6 +74,36 @@ export const authApi = baseApi.injectEndpoints({
         body: payload,
       }),
     }),
+    forgotPassword: builder.mutation<
+      ApiResponse<ForgotPasswordResponse>,
+      ForgotPasswordPayload
+    >({
+      query: (payload) => ({
+        url: "/auth/forgot-password",
+        method: "POST",
+        body: payload,
+      }),
+    }),
+    resendOtp: builder.mutation<
+      ApiResponse<ResendOtpResponse>,
+      ResendOtpPayload
+    >({
+      query: (payload) => ({
+        url: "/auth/resend-otp",
+        method: "POST",
+        body: payload,
+      }),
+    }),
+    resetPassword: builder.mutation<
+      ApiResponse<ResetPasswordResponse>,
+      ResetPasswordPayload
+    >({
+      query: (payload) => ({
+        url: "/auth/reset-password",
+        method: "POST",
+        body: payload,
+      }),
+    }),
   }),
 });
 
@@ -72,4 +112,7 @@ export const {
   useVerifyOtpMutation,
   useLoginMutation,
   useRefreshTokenMutation,
+  useForgotPasswordMutation,
+  useResendOtpMutation,
+  useResetPasswordMutation,
 } = authApi;

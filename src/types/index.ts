@@ -53,6 +53,31 @@ export interface VerifyOtpPayload {
   otp: string;
 }
 
+export interface ForgotPasswordPayload {
+  email: string;
+}
+
+export interface ForgotPasswordResponse {
+  resetToken: string;
+  otp?: string;
+}
+
+export interface ResendOtpPayload {
+  email: string;
+}
+
+export interface ResendOtpResponse {
+  otp?: string;
+}
+
+export interface ResetPasswordPayload {
+  newPassword: string;
+}
+
+export interface ResetPasswordResponse {
+  message: string;
+}
+
 export interface RefreshTokenPayload {
   token: string;
 }

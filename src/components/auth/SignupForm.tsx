@@ -1,14 +1,17 @@
 "use client";
 
 import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Eye, EyeOff, Mail, Lock, User, Building } from "lucide-react";
+import { Eye, EyeOff, Mail, Lock, User, Building, Phone } from "lucide-react";
 import { useRegisterMutation } from "@/lib/api/authApi";
 import { UserRole } from "@/lib/features/user/types";
 import { RegisterPayload } from "@/types";
+import { signupSchema, SignupValues } from "@/lib/validations/auth";
 
 interface SignupFormProps {
   userType: UserRole;
@@ -23,65 +26,48 @@ export function SignupForm({
   onVerificationNeeded,
   onSwitchToLogin,
 }: SignupFormProps) {
-  const [formData, setFormData] = useState({
-    email: "",
-    password: "",
-    confirmPassword: "",
-    phoneNumber: "",
-    fullName: "",
-    companyName: "",
-    agreeToTerms: false,
-  });
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [error, setError] = useState("");
-  const [register, { isLoading: isRegistering }] = useRegisterMutation();
+  const [registerUser, { isLoading: isRegistering, error: apiError }] =
+    useRegisterMutation();
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value, type, checked } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: type === "checkbox" ? checked : value,
-    }));
-  };
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<SignupValues>({
+    resolver: zodResolver(signupSchema),
+    defaultValues: {
+      agreeToTerms: false,
+    },
+  });
 
-  const handleSignupSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError("");
-
-    if (formData.password !== formData.confirmPassword) {
-      setError("Passwords do not match");
-      return;
-    }
-    if (!formData.agreeToTerms) {
-      setError("You must agree to the terms and policy");
-      return;
-    }
-
+  const onSubmit = async (data: SignupValues) => {
     const payload: RegisterPayload = {
-      email: formData.email,
-      password: formData.password,
-      phoneNumber: formData.phoneNumber,
-      name: formData.fullName,
+      email: data.email,
+      password: data.password,
+      phoneNumber: data.phoneNumber,
+      name: data.fullName,
       role: userType,
       ...(userType === "employer"
-        ? { company: { name: formData.companyName } }
+        ? { company: { name: data.companyName } }
         : {}),
     };
 
     try {
-      const response = await register(payload).unwrap();
+      const response = await registerUser(payload).unwrap();
       const tempAccessToken = response.data!.accessToken;
 
       if (tempAccessToken) {
-        onVerificationNeeded(formData.email, tempAccessToken);
-      } else {
-        setError("Could not get verification token. Please try again.");
+        onVerificationNeeded(data.email, tempAccessToken);
       }
     } catch (err: any) {
-      setError(err.data?.message || "Registration failed. Please try again.");
+      // Error handled by apiError
     }
   };
+
+  const errorMessage =
+    (apiError as any)?.data?.message || "Registration failed. Please try again.";
 
   return (
     <div>
@@ -93,7 +79,7 @@ export function SignupForm({
           Complete your registration to get started
         </p>
       </DialogHeader>
-      <form onSubmit={handleSignupSubmit} className="space-y-6">
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
         <button
           type="button"
           onClick={onBack}
@@ -107,15 +93,17 @@ export function SignupForm({
             <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
             <Input
               id="fullName"
-              name="fullName"
               type="text"
-              required
-              value={formData.fullName}
-              onChange={handleChange}
               placeholder="Enter your full name"
-              className="pl-10 h-12"
+              className={`pl-10 h-12 ${
+                errors.fullName ? "border-red-500" : ""
+              }`}
+              {...register("fullName")}
             />
           </div>
+          {errors.fullName && (
+            <p className="text-sm text-red-500">{errors.fullName.message}</p>
+          )}
         </div>
         {userType === "employer" && (
           <div className="space-y-2">
@@ -124,15 +112,19 @@ export function SignupForm({
               <Building className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
               <Input
                 id="companyName"
-                name="companyName"
                 type="text"
-                required
-                value={formData.companyName}
-                onChange={handleChange}
                 placeholder="Enter your company name"
-                className="pl-10 h-12"
+                className={`pl-10 h-12 ${
+                  errors.companyName ? "border-red-500" : ""
+                }`}
+                {...register("companyName")}
               />
             </div>
+            {errors.companyName && (
+              <p className="text-sm text-red-500">
+                {errors.companyName.message}
+              </p>
+            )}
           </div>
         )}
         <div className="space-y-2">
@@ -141,31 +133,33 @@ export function SignupForm({
             <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
             <Input
               id="email"
-              name="email"
               type="email"
-              required
-              value={formData.email}
-              onChange={handleChange}
               placeholder="Enter your email"
-              className="pl-10 h-12"
+              className={`pl-10 h-12 ${errors.email ? "border-red-500" : ""}`}
+              {...register("email")}
             />
           </div>
+          {errors.email && (
+            <p className="text-sm text-red-500">{errors.email.message}</p>
+          )}
         </div>
         <div className="space-y-2">
           <label htmlFor="phoneNumber">Phone Number</label>
           <div className="relative">
-            <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+            <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
             <Input
               id="phoneNumber"
-              name="phoneNumber"
               type="text"
-              required
-              value={formData.phoneNumber}
-              onChange={handleChange}
               placeholder="Enter your Phone Number"
-              className="pl-10 h-12"
+              className={`pl-10 h-12 ${
+                errors.phoneNumber ? "border-red-500" : ""
+              }`}
+              {...register("phoneNumber")}
             />
           </div>
+          {errors.phoneNumber && (
+            <p className="text-sm text-red-500">{errors.phoneNumber.message}</p>
+          )}
         </div>
         <div className="space-y-2">
           <label htmlFor="password">Password</label>
@@ -173,13 +167,12 @@ export function SignupForm({
             <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
             <Input
               id="password"
-              name="password"
               type={showPassword ? "text" : "password"}
-              required
-              value={formData.password}
-              onChange={handleChange}
               placeholder="Create a password"
-              className="pl-10 pr-10 h-12"
+              className={`pl-10 pr-10 h-12 ${
+                errors.password ? "border-red-500" : ""
+              }`}
+              {...register("password")}
             />
             <button
               type="button"
@@ -189,6 +182,9 @@ export function SignupForm({
               {showPassword ? <EyeOff /> : <Eye />}
             </button>
           </div>
+          {errors.password && (
+            <p className="text-sm text-red-500">{errors.password.message}</p>
+          )}
         </div>
         <div className="space-y-2">
           <label htmlFor="confirmPassword">Confirm Password</label>
@@ -196,13 +192,12 @@ export function SignupForm({
             <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
             <Input
               id="confirmPassword"
-              name="confirmPassword"
               type={showConfirmPassword ? "text" : "password"}
-              required
-              value={formData.confirmPassword}
-              onChange={handleChange}
               placeholder="Confirm your password"
-              className="pl-10 pr-10 h-12"
+              className={`pl-10 pr-10 h-12 ${
+                errors.confirmPassword ? "border-red-500" : ""
+              }`}
+              {...register("confirmPassword")}
             />
             <button
               type="button"
@@ -212,16 +207,18 @@ export function SignupForm({
               {showConfirmPassword ? <EyeOff /> : <Eye />}
             </button>
           </div>
+          {errors.confirmPassword && (
+            <p className="text-sm text-red-500">
+              {errors.confirmPassword.message}
+            </p>
+          )}
         </div>
         <div className="flex items-center">
           <input
             type="checkbox"
             id="agreeToTerms"
-            name="agreeToTerms"
-            checked={formData.agreeToTerms}
-            onChange={handleChange}
-            required
             className="rounded border-gray-300 text-primary focus:ring-primary"
+            {...register("agreeToTerms")}
           />
           <label
             htmlFor="agreeToTerms"
@@ -245,16 +242,15 @@ export function SignupForm({
             </a>
           </label>
         </div>
-        {error && (
+        {errors.agreeToTerms && (
+          <p className="text-sm text-red-500">{errors.agreeToTerms.message}</p>
+        )}
+        {apiError && (
           <Alert variant="destructive">
-            <AlertDescription>{error}</AlertDescription>
+            <AlertDescription>{errorMessage}</AlertDescription>
           </Alert>
         )}
-        <Button
-          type="submit"
-          disabled={isRegistering || !formData.agreeToTerms}
-          className="w-full h-12"
-        >
+        <Button type="submit" disabled={isRegistering} className="w-full h-12">
           {isRegistering ? "Creating account..." : "Create Account"}
         </Button>
       </form>

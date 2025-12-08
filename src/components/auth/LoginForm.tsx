@@ -1,8 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
-import { motion } from "framer-motion";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -10,58 +10,43 @@ import { DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Eye, EyeOff, Mail, Lock } from "lucide-react";
 
 import { useLoginMutation } from "@/lib/api/authApi";
-import { LoginPayload } from "@/types";
+import { loginSchema, LoginValues } from "@/lib/validations/auth";
 
 interface LoginFormProps {
   onClose: () => void;
   onSwitchToSignup: () => void;
+  onForgotPassword: () => void;
 }
 
-export function LoginForm({ onClose, onSwitchToSignup }: LoginFormProps) {
-  const [formData, setFormData] = useState({ email: "", password: "" });
+export function LoginForm({
+  onClose,
+  onSwitchToSignup,
+  onForgotPassword,
+}: LoginFormProps) {
   const [showPassword, setShowPassword] = useState(false);
-  const [error, setError] = useState("");
-  const router = useRouter();
-  const [login, { isLoading: isLoggingIn }] = useLoginMutation();
+  const [login, { isLoading: isLoggingIn, error: apiError }] =
+    useLoginMutation();
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
-  };
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<LoginValues>({
+    resolver: zodResolver(loginSchema),
+  });
 
-  const handleLoginSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError("");
-
-    const payload: LoginPayload = {
-      email: formData.email,
-      password: formData.password,
-    };
-
+  const onSubmit = async (data: LoginValues) => {
     try {
-      const response = await login(payload).unwrap();
+      const response = await login(data).unwrap();
       onClose();
-      // setTimeout(() => {
-      //   const userRole = response.data!.user.role;
-      //   switch (userRole) {
-      //     case "admin":
-      //       router.push("/admin/dashboard");
-      //       break;
-      //     case "employer":
-      //       router.push("/competitions/manage");
-      //       break;
-      //     case "employee":
-      //       router.push("/competitions/my");
-      //       break;
-      //     default:
-      //       router.push("/");
-      //   }
-      // }, 100);
     } catch (err: any) {
-      setError(
-        err.data?.message || "Login failed. Please check your credentials."
-      );
+      // Error handled by apiError
     }
   };
+
+  const errorMessage =
+    (apiError as any)?.data?.message ||
+    "Login failed. Please check your credentials.";
 
   return (
     <div className="p-8">
@@ -71,22 +56,22 @@ export function LoginForm({ onClose, onSwitchToSignup }: LoginFormProps) {
           Sign in to continue to your dashboard
         </p>
       </DialogHeader>
-      <form onSubmit={handleLoginSubmit} className="space-y-6">
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
         <div className="space-y-2">
           <label htmlFor="email">Email Address</label>
           <div className="relative">
             <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
             <Input
               id="email"
-              name="email"
               type="email"
-              required
-              value={formData.email}
-              onChange={handleChange}
               placeholder="Enter your email"
-              className="pl-10 h-12"
+              className={`pl-10 h-12 ${errors.email ? "border-red-500" : ""}`}
+              {...register("email")}
             />
           </div>
+          {errors.email && (
+            <p className="text-sm text-red-500">{errors.email.message}</p>
+          )}
         </div>
         <div className="space-y-2">
           <label htmlFor="password">Password</label>
@@ -94,13 +79,12 @@ export function LoginForm({ onClose, onSwitchToSignup }: LoginFormProps) {
             <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
             <Input
               id="password"
-              name="password"
               type={showPassword ? "text" : "password"}
-              required
-              value={formData.password}
-              onChange={handleChange}
               placeholder="Enter your password"
-              className="pl-10 pr-10 h-12"
+              className={`pl-10 pr-10 h-12 ${
+                errors.password ? "border-red-500" : ""
+              }`}
+              {...register("password")}
             />
             <button
               type="button"
@@ -110,6 +94,9 @@ export function LoginForm({ onClose, onSwitchToSignup }: LoginFormProps) {
               {showPassword ? <EyeOff /> : <Eye />}
             </button>
           </div>
+          {errors.password && (
+            <p className="text-sm text-red-500">{errors.password.message}</p>
+          )}
         </div>
         <div className="flex items-center justify-between">
           <label className="flex items-center cursor-pointer">
@@ -123,14 +110,15 @@ export function LoginForm({ onClose, onSwitchToSignup }: LoginFormProps) {
           </label>
           <button
             type="button"
+            onClick={onForgotPassword}
             className="text-sm font-medium text-primary hover:underline"
           >
             Forgot password?
           </button>
         </div>
-        {error && (
+        {apiError && (
           <Alert variant="destructive">
-            <AlertDescription>{error}</AlertDescription>
+            <AlertDescription>{errorMessage}</AlertDescription>
           </Alert>
         )}
         <Button type="submit" disabled={isLoggingIn} className="w-full h-12">
