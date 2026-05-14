@@ -5,7 +5,6 @@ import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
-import Image from "next/image";
 import {
   Trophy,
   Users,
@@ -22,10 +21,6 @@ import { HomeResponse } from "@/types";
 interface HeroProps {
   homeData?: HomeResponse;
 }
-
-const BANNER_IMAGE_PATH = "/images/hero-banner-new.jpg";
-const MOBILE_BANNER_IMAGE_PATH = "/images/hero-banner-new.jpg";
-const BANNER_LINK_URL = "/competitions/68fc0272b956bef70b3c6fc8";
 
 export function Hero({ homeData }: HeroProps) {
   const stats = [
@@ -53,30 +48,6 @@ export function Hero({ homeData }: HeroProps) {
 
   return (
     <section className="relative overflow-hidden">
-      <div className="w-full bg-gray-900 shadow-xl mt-4 mb-8">
-        <Link href={BANNER_LINK_URL} className="block w-full">
-          <div className="relative w-full">
-            <Image
-              src={MOBILE_BANNER_IMAGE_PATH}
-              alt="Promotional Banner"
-              width={1000}
-              height={1800}
-              priority
-              className="object-cover w-full h-auto block sm:hidden"
-            />
-
-            <Image
-              src={BANNER_IMAGE_PATH}
-              alt="Promotional Banner"
-              width={1920}
-              height={720}
-              priority
-              className="object-cover w-full h-auto hidden sm:block"
-            />
-          </div>
-        </Link>
-      </div>
-
       <div className="bg-gradient-to-br from-slate-50 via-orange-50/40 to-blue-50/30">
         {/* Animated blobs - already responsive */}
         <motion.div
